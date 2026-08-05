@@ -13,4 +13,5 @@ serde_json.workspace = true
 sha2.workspace = true
 anyhow.workspace = true
 uenv-core = { path = "../uenv-core" }
+uenv-rules = { path = "../uenv-rules" }
 

@@ -66,7 +66,11 @@ pub enum Commands {
     },
 
     /// 计算环境指纹
-    Fingerprint,
+    Fingerprint {
+        /// 从已有快照文件计算（缺省 = 现场 scan 后计算）
+        #[arg(long)]
+        from: Option<PathBuf>,
+    },
 
     /// 比较两个环境快照
     Diff {

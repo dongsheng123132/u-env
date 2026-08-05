@@ -1,0 +1,1306 @@
+{
+  "spec": "origin-environment/v0.1",
+  "generated_at": "2026-08-06T00:00:00Z",
+  "uenv_version": "0.0.1",
+  "identity": {
+    "host_alias": "<host>",
+    "os": {
+      "family": "windows",
+      "product_name": "Unknown",
+      "product_name_raw": "Unknown",
+      "version": "0.0.0",
+      "build": 0,
+      "ubr": null,
+      "edition": null,
+      "display_version": null
+    },
+    "architecture": "x64",
+    "project": null
+  },
+  "detectors": {
+    "fs.project-location": {
+      "id": "fs.project-location",
+      "layer": "host",
+      "title": "项目位置",
+      "status": "ok",
+      "summary": "位置",
+      "facts": {
+        "drive": {
+          "str": "C:"
+        },
+        "filesystem": {
+          "str": "NTFS"
+        },
+        "on_onedrive": {
+          "bool": true
+        },
+        "on_network": {
+          "bool": false
+        },
+        "on_wsl": {
+          "bool": false
+        },
+        "path_has_non_ascii": {
+          "bool": false
+        },
+        "path_has_space": {
+          "bool": false
+        }
+      },
+      "volatile": {},
+      "evidence": [],
+      "elapsed_ms": 0
+    },
+    "host.disk": {
+      "id": "host.disk",
+      "layer": "host",
+      "title": "磁盘卷信息",
+      "status": "ok",
+      "summary": "5 个卷",
+      "facts": {
+        "volumes": {
+          "set": [
+            {
+              "map": {
+                "drive": {
+                  "str": "C:"
+                },
+                "filesystem": {
+                  "str": "NTFS"
+                },
+                "total_bytes": {
+                  "int": 511659282432
+                }
+              }
+            },
+            {
+              "map": {
+                "drive": {
+                  "str": "Y:"
+                },
+                "filesystem": {
+                  "str": "NTFS"
+                },
+                "total_bytes": {
+                  "int": 17178816512
+                }
+              }
+            },
+            {
+              "map": {
+                "drive": {
+                  "str": "D:"
+                },
+                "filesystem": {
+                  "str": "NTFS"
+                },
+                "total_bytes": {
+                  "int": 460387061760
+                }
+              }
+            },
+            {
+              "map": {
+                "drive": {
+                  "str": "X:"
+                },
+                "filesystem": {
+                  "str": "NTFS"
+                },
+                "total_bytes": {
+                  "int": 17360220160
+                }
+              }
+            },
+            {
+              "map": {
+                "drive": {
+                  "str": "Z:"
+                },
+                "filesystem": {
+                  "str": "NTFS"
+                },
+                "total_bytes": {
+                  "int": 17178816512
+                }
+              }
+            }
+          ]
+        }
+      },
+      "volatile": {
+        "free_bytes": {
+          "map": {
+            "C:": {
+              "int": 29708165120
+            },
+            "D:": {
+              "int": 88078426112
+            },
+            "X:": {
+              "int": 13975150592
+            },
+            "Y:": {
+              "int": 8426348544
+            },
+            "Z:": {
+              "int": 15968038912
+            }
+          }
+        }
+      },
+      "evidence": [
+        {
+          "kind": "command",
+          "source": "powershell Get-Volume | ConvertTo-Json",
+          "exit_code": 0,
+          "excerpt": "[{\"DriveLetter\":\"C\",\"FileSystem\":\"NTFS\",\"Size\":511659282432,\"SizeRemaining\":29708165120},{\"DriveLetter\":\"Y\",\"FileSystem\":\"NTFS\",\"Size\":17178816512,\"SizeRemaining\":8426348544},{\"DriveLetter\":\"D\",\"FileSystem\":\"NTFS\",\"Size\":460387061760,\"SizeRemaining\":88078426112},{\"DriveLetter\":\"X\",\"FileSystem\":\"NTFS\",\"Size\":17360220160,\"SizeRemaining\":13975150592},{\"DriveLetter\":\"Z\",\"FileSystem\":\"NTFS\",\"Size\":17178816512,\"SizeRemaining\":15968038912}]\r\n"
+        }
+      ],
+      "elapsed_ms": 2530
+    },
+    "host.hardware": {
+      "id": "host.hardware",
+      "layer": "host",
+      "title": "硬件信息",
+      "status": "ok",
+      "summary": "12th Gen Intel(R) Core(TM) i9-12900H",
+      "facts": {
+        "cpu_cores": {
+          "int": 14
+        },
+        "cpu_model": {
+          "str": "12th Gen Intel(R) Core(TM) i9-12900H"
+        },
+        "is_virtual": {
+          "bool": false
+        },
+        "ram_total_bytes": {
+          "int": 68501889024
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "command",
+          "source": "powershell -NoProfile -Command \"$cpu=Get-CimInstance Win32_Processor | Select-Object -First 1; $cs=Get-CimInstance Win32_ComputerSystem; [PSCustomObject]@{cpu_name=$cpu.Name; cores=$cpu.NumberOfCores; ram=$cs.TotalPhysicalMemory; manufacturer=$cs.Manufacturer; model=$cs.Model} | ConvertTo-Json -Compress\"",
+          "exit_code": 0,
+          "excerpt": "{\"cpu_name\":\"12th Gen Intel(R) Core(TM) i9-12900H\",\"cores\":14,\"ram\":68501889024,\"manufacturer\":\"LENOVO\",\"model\":\"82RF\"}\r\n"
+        }
+      ],
+      "elapsed_ms": 2428
+    },
+    "net.proxy": {
+      "id": "net.proxy",
+      "layer": "host",
+      "title": "网络代理配置",
+      "status": "ok",
+      "summary": "系统代理 127.0.0.1:7897，与 env 一致",
+      "facts": {
+        "consistent": {
+          "bool": true
+        },
+        "env_http_proxy": {
+          "str": "http://127.0.0.1:7897"
+        },
+        "env_https_proxy": {
+          "str": "http://127.0.0.1:7897"
+        },
+        "git_proxy": {
+          "str": "http://127.0.0.1:7897"
+        },
+        "no_proxy": {
+          "str": "localhost,127.0.0.1,::1"
+        },
+        "system_proxy": {
+          "str": "127.0.0.1:7897"
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "registry",
+          "source": "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ProxyEnable",
+          "exit_code": null,
+          "excerpt": "1"
+        },
+        {
+          "kind": "registry",
+          "source": "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ProxyServer",
+          "exit_code": null,
+          "excerpt": "127.0.0.1:7897"
+        },
+        {
+          "kind": "env",
+          "source": "HTTP_PROXY / HTTPS_PROXY / NO_PROXY",
+          "exit_code": null,
+          "excerpt": "HTTP=http://127.0.0.1:7897 HTTPS=http://127.0.0.1:7897 NO_PROXY=localhost,127.0.0.1,::1"
+        },
+        {
+          "kind": "command",
+          "source": "npm config get proxy",
+          "exit_code": 0,
+          "excerpt": "null\n"
+        },
+        {
+          "kind": "command",
+          "source": "git config --get http.proxy",
+          "exit_code": 0,
+          "excerpt": "http://127.0.0.1:7897\n"
+        }
+      ],
+      "elapsed_ms": 731
+    },
+    "path.analysis": {
+      "id": "path.analysis",
+      "layer": "toolchain",
+      "title": "PATH 分析",
+      "status": "ok",
+      "summary": "PATH 93 条",
+      "facts": {
+        "duplicates": {
+          "set": [
+            {
+              "str": "c:\\program files (x86)\\nvidia corporation\\physx\\common"
+            },
+            {
+              "str": "c:\\program files\\dotnet"
+            },
+            {
+              "str": "c:\\program files\\git\\cmd"
+            },
+            {
+              "str": "c:\\program files\\git\\mingw64\\bin"
+            },
+            {
+              "str": "c:\\program files\\git\\usr\\bin"
+            },
+            {
+              "str": "c:\\program files\\github cli"
+            },
+            {
+              "str": "c:\\program files\\go\\bin"
+            },
+            {
+              "str": "c:\\program files\\nodejs"
+            },
+            {
+              "str": "c:\\program files\\putty"
+            },
+            {
+              "str": "c:\\program files\\rust stable msvc 1.88\\bin"
+            },
+            {
+              "str": "c:\\program files\\tailscale"
+            },
+            {
+              "str": "c:\\programdata\\chocolatey\\bin"
+            },
+            {
+              "str": "c:\\users\\<user>\\.local\\bin"
+            },
+            {
+              "str": "c:\\users\\<user>\\.uking\\runtime\\python\\scripts"
+            },
+            {
+              "str": "c:\\users\\<user>\\appdata\\roaming\\npm"
+            },
+            {
+              "str": "c:\\users\\<user>\\bin"
+            },
+            {
+              "str": "c:\\windows"
+            },
+            {
+              "str": "c:\\windows\\system32"
+            },
+            {
+              "str": "c:\\windows\\system32\\openssh"
+            },
+            {
+              "str": "c:\\windows\\system32\\wbem"
+            },
+            {
+              "str": "c:\\windows\\system32\\windowspowershell\\v1.0"
+            }
+          ]
+        },
+        "entry_count": {
+          "int": 93
+        },
+        "missing": {
+          "set": [
+            {
+              "str": "C:\\Program Files\\Git\\usr\\local\\bin"
+            },
+            {
+              "str": "E:\\U-Hermes\\data\\home\\bin"
+            },
+            {
+              "str": "Y:\\compare-upstream\\hermes-agent\\venv\\Scripts"
+            },
+            {
+              "str": "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+            },
+            {
+              "str": "C:\\Program Files (x86)\\Tencent\\???web?????????\\dll"
+            },
+            {
+              "str": "J:\\U-Claw\\resources\\cli"
+            },
+            {
+              "str": "Y:\\U-Claw\\resources\\cli"
+            },
+            {
+              "str": "H:\\U-Claw\\resources\\cli"
+            },
+            {
+              "str": "G:\\U-Claw\\resources\\cli"
+            },
+            {
+              "str": "I:\\U-Claw\\resources\\cli"
+            },
+            {
+              "str": "L:\\U-Claw\\resources\\cli"
+            },
+            {
+              "str": "E:\\U-Claw\\resources\\cli"
+            },
+            {
+              "str": "F:\\U-Claw\\resources\\cli"
+            }
+          ]
+        },
+        "shadowed_exes": {
+          "map": {
+            "cargo": {
+              "set": [
+                {
+                  "path": "C:\\Program Files\\Rust stable MSVC 1.88\\bin\\cargo.EXE"
+                },
+                {
+                  "path": "C:\\Users\\<user>\\.cargo\\bin\\cargo.EXE"
+                }
+              ]
+            },
+            "dotnet": {
+              "set": [
+                {
+                  "path": "C:\\Program Files\\dotnet\\dotnet.EXE"
+                },
+                {
+                  "path": "C:\\Users\\<user>\\Tools\\dotnet\\dotnet.EXE"
+                }
+              ]
+            },
+            "git": {
+              "set": [
+                {
+                  "path": "C:\\Program Files\\Git\\mingw64\\bin\\git.EXE"
+                },
+                {
+                  "path": "C:\\Program Files\\Git\\cmd\\git.EXE"
+                }
+              ]
+            },
+            "node": {
+              "set": [
+                {
+                  "path": "C:\\Program Files\\nodejs\\node.EXE"
+                },
+                {
+                  "path": "C:\\Users\\<user>\\Tools\\node\\node-v23.9.0-win-x64\\node.EXE"
+                }
+              ]
+            },
+            "npm": {
+              "set": [
+                {
+                  "path": "C:\\Program Files\\nodejs\\npm.CMD"
+                },
+                {
+                  "path": "C:\\Users\\<user>\\Tools\\node\\node-v23.9.0-win-x64\\npm.CMD"
+                }
+              ]
+            },
+            "npx": {
+              "set": [
+                {
+                  "path": "C:\\Program Files\\nodejs\\npx.CMD"
+                },
+                {
+                  "path": "C:\\Users\\<user>\\Tools\\node\\node-v23.9.0-win-x64\\npx.CMD"
+                }
+              ]
+            },
+            "python": {
+              "set": [
+                {
+                  "path": "C:\\Users\\<user>\\.uking\\runtime\\python\\python.EXE"
+                },
+                {
+                  "path": "Y:\\compare-upstream\\hermes-home\\hermes-agent\\venv\\Scripts\\python.EXE"
+                },
+                {
+                  "path": "C:\\Users\\<user>\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\python.EXE"
+                },
+                {
+                  "path": "C:\\Users\\<user>\\AppData\\Local\\Programs\\Python\\Python311\\python.EXE"
+                },
+                {
+                  "path": "C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WindowsApps\\python.EXE"
+                }
+              ]
+            },
+            "rustc": {
+              "set": [
+                {
+                  "path": "C:\\Program Files\\Rust stable MSVC 1.88\\bin\\rustc.EXE"
+                },
+                {
+                  "path": "C:\\Users\\<user>\\.cargo\\bin\\rustc.EXE"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "volatile": {
+        "path_raw": {
+          "str": "D:\\uking编程\\本境协议\\target\\debug\\deps;D:\\uking编程\\本境协议\\target\\debug;C:\\Program Files\\Rust stable MSVC 1.88\\lib\\rustlib\\x86_64-pc-windows-msvc\\lib;C:\\Users\\<user>\\bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\local\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\<user>\\bin;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Links;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\jqlang.jq_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\sharkdp.bat_Microsoft.Winget.Source_8wekyb3d8bbwe\\bat-v0.26.1-x86_64-pc-windows-msvc;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\junegunn.fzf_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\BurntSushi.ripgrep.MSVC_Microsoft.Winget.Source_8wekyb3d8bbwe\\ripgrep-15.1.0-x86_64-pc-windows-msvc;C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.6.4.0_x64__8wekyb3d8bbwe;C:\\Users\\<user>\\.uking\\runtime\\python\\Scripts;C:\\Users\\<user>\\.uking\\runtime\\python;C:\\Users\\<user>\\AppData\\Roaming\\npm;C:\\Users\\<user>\\bin;C:\\Users\\<user>\\.local\\bin;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Windows\\System32\\OpenSSH;C:\\Program Files\\Go\\bin;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Rust stable MSVC 1.88\\bin;C:\\Program Files (x86)\\Tencent\\微信web开发者工具\\dll;C:\\Program Files\\PuTTY;C:\\Program Files\\Tailscale;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\WireGuard;C:\\Users\\<user>\\.uking\\shims;C:\\Users\\<user>\\.kimi-code\\bin;E:\\U-Hermes\\data\\home\\bin;Y:\\compare-upstream\\hermes-home\\hermes-agent\\venv\\Scripts;Y:\\compare-upstream\\hermes-home\\bin;C:\\Users\\<user>\\bin;Y:\\compare-upstream\\hermes-agent\\venv\\Scripts;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Windows\\System32\\OpenSSH;C:\\Program Files\\Go\\bin;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\Rust stable MSVC 1.88\\bin;C:\\Program Files (x86)\\Tencent\\???web?????????\\dll;C:\\Program Files\\PuTTY;C:\\Program Files\\Tailscale;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Users\\<user>\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts;C:\\Users\\<user>\\.local\\bin;C:\\Users\\<user>\\Tools\\node\\node-v23.9.0-win-x64;C:\\Users\\<user>\\Tools\\dotnet;C:\\Users\\<user>\\.cargo\\bin;C:\\Users\\<user>\\AppData\\Local\\Programs\\Python\\Python311\\Scripts;C:\\Users\\<user>\\AppData\\Local\\Programs\\Python\\Python311;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\<user>\\go\\bin;C:\\Users\\<user>;J:\\U-Claw\\resources\\cli;Y:\\U-Claw\\resources\\cli;H:\\U-Claw\\resources\\cli;G:\\U-Claw\\resources\\cli;I:\\U-Claw\\resources\\cli;L:\\U-Claw\\resources\\cli;C:\\Program Files\\Notepad++;E:\\U-Claw\\resources\\cli;C:\\Users\\<user>\\.openclaw-autoclaw\\bin;C:\\Users\\<user>\\AppData\\Local\\Android\\Sdk\\platform-tools;Z:\\U-Claw\\resources\\cli;C:\\Users\\<user>\\.uking\\runtime\\python\\Scripts;F:\\U-Claw\\resources\\cli;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\JohnMacFarlane.Pandoc_Microsoft.Winget.Source_8wekyb3d8bbwe\\pandoc-3.10;C:\\Program Files\\ClawX\\resources\\cli;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Syncthing.Syncthing_Microsoft.Winget.Source_8wekyb3d8bbwe\\syncthing-windows-amd64-v2.1.2;C:\\Users\\<user>\\.qoder-cn\\bin\\qoderclicn;C:\\Users\\<user>\\AppData\\Roaming\\npm;C:\\Program Files\\Git\\usr\\bin\\vendor_perl;C:\\Program Files\\Git\\usr\\bin\\core_perl"
+        }
+      },
+      "evidence": [
+        {
+          "kind": "env",
+          "source": "PATH",
+          "exit_code": null,
+          "excerpt": "D:\\uking编程\\本境协议\\target\\debug\\deps;D:\\uking编程\\本境协议\\target\\debug;C:\\Program Files\\Rust stable MSVC 1.88\\lib\\rustlib\\x86_64-pc-windows-msvc\\lib;C:\\Users\\<user>\\bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\local\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\<user>\\bin;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Links;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\jqlang.jq_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\sharkdp.bat_Microsoft.Winget.Source_8wekyb3d8bbwe\\bat-v0.26.1-x86_64-pc-windows-msvc;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\junegunn.fzf_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\BurntSushi.ripgrep.MSVC_Microsoft.Winget.Source_8wekyb3d8bbwe\\ripgrep-15.1.0-x86_64-pc-windows-msvc;C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.6.4.0_x64__8wekyb3d8bbwe;C:\\Users\\<user>\\.uking\\runtime\\python\\Scripts;C:\\Users\\<user>\\.uking\\runtime\\python;C:\\Users\\<user>\\AppData\\Roaming\\npm;C:\\Users\\<user>\\bin;C:\\Users\\<user>\\.local\\bin;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Windows\\System32\\OpenSSH;C:\\Program Files\\Go\\bin;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Rust stable MSVC 1.88\\bin;C:\\Program Files (x86)\\Tencent\\微信web开发者工具\\dll;C:\\Program Files\\PuTTY;C:\\Program Files\\Tailscale;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\WireGuard;C:\\Users\\<user>\\.uking\\shims;C:\\Users\\<user>\\.kimi-code\\bin;E:\\U-Hermes\\data\\home\\bin;Y:\\compare-upstream\\hermes-home\\hermes-agent\\venv\\Scripts;Y:\\compare-upstream\\hermes-home\\bin;C:\\Users\\<user>\\bin;Y:\\compare-upstream\\hermes-agent\\venv\\Scripts;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Windows\\System32\\OpenSSH;C:\\Program Files\\Go\\bin;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\Rust stable MSVC 1.88\\bin;C:\\Program Files (x86)\\Tencent\\???web?????????\\dll;C:\\Program Files\\PuTTY;C:\\Program Files\\Tailscale;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Users\\<user>\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts;C:\\Users\\<user>\\.local\\bin;C:\\Users\\<user>\\Tools\\node\\node-v23.9.0-win-x64;C:\\Users\\<user>\\Tools\\dotnet;C:\\Users\\<user>\\.cargo\\bin;C:\\Users\\<user>\\AppData\\Local\\Programs\\Python\\Python311\\Scripts;C:\\Users\\<user>\\AppData\\Local\\Programs\\Python\\Python311;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\<user>\\go\\bin;C:\\Users\\<user>;J:\\U-Claw\\resources\\cli;Y:\\U-Claw\\resources\\cli;H:\\U-Claw\\resources\\cli;G:\\U-Claw\\resources\\cli;I:\\U-Claw\\resources\\cli;L:\\U-Claw\\resources\\cli;C:\\Program Files\\Notepad++;E:\\U-Claw\\resources\\cli;C:\\Users\\<user>\\.openclaw-autoclaw\\bin;C:\\Users\\<user>\\AppData\\Local\\Android\\Sdk\\platform-tools;Z:\\U-Claw\\resources\\cli;C:\\Users\\<user>\\.uking\\runtime\\python\\Scripts;F:\\U-Claw\\resources\\cli;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\JohnMacFarlane.Pandoc_Microsoft.Winget.Source_8wekyb3d8bbwe\\pandoc-3.10;C:\\Program Files\\ClawX\\resources\\cli;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Syncthing.Syncthing_Microsoft.Winget.Source_8wekyb3d8bbwe\\syncthing-windows-amd64-v2.1.2;C:\\Users\\<user>\\.qoder-cn\\bin\\qoderclicn;C:\\Users\\<user>\\AppData\\Roaming\\npm;C:\\Program Files\\Git\\usr\\bin\\vendor_perl;C:\\Program Files\\Git\\usr\\bin\\core_perl"
+        }
+      ],
+      "elapsed_ms": 158
+    },
+    "project.drift": {
+      "id": "project.drift",
+      "layer": "project",
+      "title": "声明与实际的漂移",
+      "status": "ok",
+      "summary": "1 个工具声明比对",
+      "facts": {
+        "drift": {
+          "map": {
+            "rust": {
+              "map": {
+                "actual": {
+                  "version": "1.88.0"
+                },
+                "declared": {
+                  "str": "1.88"
+                },
+                "satisfied": {
+                  "bool": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "command",
+          "source": "rustc --version",
+          "exit_code": 0,
+          "excerpt": "rustc 1.88.0 (6b00bc388 2025-06-23)\n"
+        }
+      ],
+      "elapsed_ms": 109
+    },
+    "project.git": {
+      "id": "project.git",
+      "layer": "project",
+      "title": "Git 状态",
+      "status": "ok",
+      "summary": "master (dirty)",
+      "facts": {
+        "branch": {
+          "str": "master"
+        },
+        "commit": {
+          "str": "5937eff67eb1"
+        },
+        "dirty": {
+          "bool": true
+        },
+        "has_submodules": {
+          "bool": false
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "command",
+          "source": "git branch --show-current",
+          "exit_code": 0,
+          "excerpt": "master\n"
+        },
+        {
+          "kind": "command",
+          "source": "git rev-parse HEAD",
+          "exit_code": 0,
+          "excerpt": "5937eff67eb1bf4ae5efc184904ce9de94b8e737\n"
+        },
+        {
+          "kind": "command",
+          "source": "git status --porcelain",
+          "exit_code": 0,
+          "excerpt": " M Cargo.lock\n M crates/uenv-cli/src/cli.rs\n M crates/uenv-cli/src/main.rs\n M crates/uenv-fingerprint/Cargo.toml\n M crates/uenv-fingerprint/src/lib.rs\n M crates/uenv-rules/src/lib.rs\n?? crates/uenv-fingerprint/src/diff.rs\n?? crates/uenv-fingerprint/src/fingerprint.rs\n?? crates/uenv-fingerprint/src/normalize.rs\n?? tasks/gen_t4_fixtures.py\n"
+        },
+        {
+          "kind": "command",
+          "source": "git submodule status",
+          "exit_code": 0,
+          "excerpt": ""
+        }
+      ],
+      "elapsed_ms": 1830
+    },
+    "project.kind": {
+      "id": "project.kind",
+      "layer": "project",
+      "title": "项目类型",
+      "status": "ok",
+      "summary": "rust",
+      "facts": {
+        "kinds": {
+          "set": [
+            {
+              "str": "rust"
+            }
+          ]
+        },
+        "markers": {
+          "set": [
+            {
+              "str": "Cargo.toml"
+            }
+          ]
+        }
+      },
+      "volatile": {},
+      "evidence": [],
+      "elapsed_ms": 0
+    },
+    "project.lockfiles": {
+      "id": "project.lockfiles",
+      "layer": "project",
+      "title": "锁文件",
+      "status": "ok",
+      "summary": "1 个 lockfile",
+      "facts": {
+        "lockfiles": {
+          "map": {
+            "Cargo.lock": {
+              "str": "8a89070647edd4c637fd683c7ed94ac0558328ff37e23609e982f5d5c4e34dea"
+            }
+          }
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "file",
+          "source": "Cargo.lock",
+          "exit_code": null,
+          "excerpt": "sha256:8a89070647edd4c637fd683c7ed94ac0558328ff37e23609e982f5d5c4e34dea"
+        }
+      ],
+      "elapsed_ms": 0
+    },
+    "project.manifests": {
+      "id": "project.manifests",
+      "layer": "project",
+      "title": "项目清单",
+      "status": "ok",
+      "summary": "1 个声明",
+      "facts": {
+        "declared_toolchains": {
+          "map": {
+            "rust": {
+              "str": "1.88"
+            }
+          }
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "file",
+          "source": "Cargo.toml",
+          "exit_code": null,
+          "excerpt": "[workspace]\nmembers = [\"crates/*\", \"adapters/*\"]\nresolver = \"2\"\n\n[workspace.package]\nversion = \"0.0.1\"\nedition = \"2024\"\nlicense = \"Apache-2.0\"\nrepository = \"https://github.com/u-king/uenv\"\nrust-version = \"1.88\"\n\n[workspace.dependencies]\nserde = { version = \"1\", features = [\"derive\"] }\nserde_json = \"1\"\nsha2 = \"0.10\"\nanyhow = \"1\"\nthiserror = \"2\"\nwinreg = \"0.55\"\nchrono = { version = \"0.4\", features = [\"serde\"] }\nclap = { version = \"4\", features = [\"derive\"] }\nencoding_rs = \"0.8\"\n"
+        }
+      ],
+      "elapsed_ms": 0
+    },
+    "runtime.webview2": {
+      "id": "runtime.webview2",
+      "layer": "toolchain",
+      "title": "WebView2",
+      "status": "absent",
+      "summary": "WebView2",
+      "facts": {
+        "installed": {
+          "bool": false
+        },
+        "channel": {
+          "str": "evergreen"
+        }
+      },
+      "volatile": {},
+      "evidence": [],
+      "elapsed_ms": 0
+    },
+    "security.defender": {
+      "id": "security.defender",
+      "layer": "host",
+      "title": "Windows Defender",
+      "status": "degraded",
+      "summary": "实时保护 开启，排除项不可读（需管理员）",
+      "facts": {
+        "exclusion_covers_project": {
+          "bool": false
+        },
+        "realtime_enabled": {
+          "bool": true
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "command",
+          "source": "powershell (Get-MpComputerStatus).RealTimeProtectionEnabled",
+          "exit_code": 0,
+          "excerpt": "True\r\n"
+        },
+        {
+          "kind": "command",
+          "source": "powershell (Get-MpPreference).ExclusionPath | ConvertTo-Json -Compress",
+          "exit_code": 0,
+          "excerpt": "\"N/A: Must be an administrator to view exclusions\"\r\n"
+        }
+      ],
+      "elapsed_ms": 4350
+    },
+    "toolchain.dotnet": {
+      "id": "toolchain.dotnet",
+      "layer": "toolchain",
+      "title": ".NET SDK",
+      "status": "ok",
+      "summary": "1 个 SDK",
+      "facts": {
+        "runtime_versions": {
+          "set": [
+            {
+              "version": "10.0.7"
+            },
+            {
+              "version": "6.0.36"
+            },
+            {
+              "version": "7.0.20"
+            },
+            {
+              "version": "8.0.14"
+            },
+            {
+              "version": "9.0.5"
+            },
+            {
+              "version": "10.0.7"
+            }
+          ]
+        },
+        "sdk_versions": {
+          "set": [
+            {
+              "version": "10.0.203"
+            }
+          ]
+        },
+        "windows_desktop_runtimes": {
+          "set": [
+            {
+              "version": "6.0.36"
+            },
+            {
+              "version": "7.0.20"
+            },
+            {
+              "version": "8.0.14"
+            },
+            {
+              "version": "9.0.5"
+            },
+            {
+              "version": "10.0.7"
+            }
+          ]
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "command",
+          "source": "dotnet --list-sdks",
+          "exit_code": 0,
+          "excerpt": "10.0.203 [C:\\Program Files\\dotnet\\sdk]\r\n"
+        },
+        {
+          "kind": "command",
+          "source": "dotnet --list-runtimes",
+          "exit_code": 0,
+          "excerpt": "Microsoft.AspNetCore.App 10.0.7 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\nMicrosoft.NETCore.App 6.0.36 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\nMicrosoft.NETCore.App 7.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\nMicrosoft.NETCore.App 8.0.14 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\nMicrosoft.NETCore.App 9.0.5 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\nMicrosoft.NETCore.App 10.0.7 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\nMicrosoft.WindowsDesktop.App 6.0.36 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\nMicrosoft.WindowsDesktop.App 7.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\nMicrosoft.WindowsDesktop.App 8.0.14 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\nMicrosoft.WindowsDesktop.App 9.0.5 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\nMicrosoft.WindowsDesktop.App 10.0.7 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\n"
+        }
+      ],
+      "elapsed_ms": 265
+    },
+    "toolchain.git": {
+      "id": "toolchain.git",
+      "layer": "toolchain",
+      "title": "Git",
+      "status": "ok",
+      "summary": "Git 2.49.0.windows.1",
+      "facts": {
+        "autocrlf": {
+          "str": "true"
+        },
+        "longpaths": {
+          "str": "true"
+        },
+        "safe_directories": {
+          "set": [
+            {
+              "path": "*"
+            },
+            {
+              "path": "C:/Users/<user>/WeChatProjects/miniprogram-1"
+            }
+          ]
+        },
+        "symlinks": {
+          "str": "false"
+        },
+        "version": {
+          "version": "2.49.0.windows.1"
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "command",
+          "source": "git --version",
+          "exit_code": 0,
+          "excerpt": "git version 2.49.0.windows.1\n"
+        },
+        {
+          "kind": "command",
+          "source": "git config --list --show-origin",
+          "exit_code": 0,
+          "excerpt": "file:C:/Program Files/Git/etc/gitconfig\tdiff.astextplain.textconv=astextplain\nfile:C:/Program Files/Git/etc/gitconfig\tfilter.lfs.clean=git-lfs clean -- %f\nfile:C:/Program Files/Git/etc/gitconfig\tfilter.lfs.smudge=git-lfs smudge -- %f\nfile:C:/Program Files/Git/etc/gitconfig\tfilter.lfs.process=git-lfs filter-process\nfile:C:/Program Files/Git/etc/gitconfig\tfilter.lfs.required=true\nfile:C:/Program Files/Git/etc/gitconfig\thttp.sslbackend=openssl\nfile:C:/Program Files/Git/etc/gitconfig\thttp.sslcainfo=C:/Program Files/Git/mingw64/etc/ssl/certs/ca-bundle.crt\nfile:C:/Program Files/Git/etc/gitconfig\tcore.autocrlf=true\nfile:C:/Program Files/Git/etc/gitconfig\tcore.fscache=true\nfile:C:/Program Files/Git/etc/gitconfig\tcore.symlinks=false\nfile:C:/Program Files/Git/etc/gitconfig\tpull.rebase=false\nfile:C:/Program Files/Git/etc/gitconfig\tcredential.helper=manager\nfile:C:/Program Files/Git/etc/gitconfig\tcredential.https://dev.azure.com.usehttppath=true\nfile:C:/Program Files/Git/etc/gitconfig\tinit.defaultbranch=master\nfile:C:/Users/<user>/.gitconfig\tuser.name=hfshfg\nfile:C:/Users/<user>/.gitconfig\tuser.email=<redacted>\nfile:C:/Users/<user>/.gitconfig\tcredential.https://git.weixin.qq.com.provider=generic\nfile:C:/Users/<user>/.gitconfig\tcredential.helper=manager\nfile:C:/Users/<user>/.gitconfig\tcredential.https://gitee.com.provider=generic\nfile:C:/Users/<user>/.gitconfig\thttp.version=HTTP/1.1\nfile:C:/Users/<user>/.gitconfig\thttp.sslbackend=schannel\nfile:C:/Users/<user>/.gitconfig\thttp.postbuffer=157286400\nfile:C:/Users/<user>/.gitconfig\thttp.proxy=http://127.0.0.1:7897\nfile:C:/Users/<user>/.gitconfig\thttps.proxy=http://127.0.0.1:7897\nfile:C:/Users/<user>/.gitconfig\tsafe.directory=C:/Users/<user>/WeChatProjects/miniprogram-1\nfile:C:/Users/<user>/.gitconfig\twindows.appendatomically=false\nfile:C:/Users/<user>/.gitconfig\tcredential.https://huggingface.co.provider=generic\nfile:C:/Users/<user>/.gitconfig\tsafe.directory=*\nfile:C:/Users/<user>/.gitconfig\tsafe.directory=*\nfile:C:/Users/<user>/.git"
+        }
+      ],
+      "elapsed_ms": 325
+    },
+    "toolchain.msvc": {
+      "id": "toolchain.msvc",
+      "layer": "toolchain",
+      "title": "MSVC 工具链",
+      "status": "ok",
+      "summary": "1 个实例（含 C++ workload）",
+      "facts": {
+        "has_cpp_workload": {
+          "bool": true
+        },
+        "instances": {
+          "set": [
+            {
+              "map": {
+                "display_name": {
+                  "str": "Visual Studio 生成工具 2019"
+                },
+                "install_path": {
+                  "path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools"
+                },
+                "msvc_toolset_versions": {
+                  "set": [
+                    {
+                      "version": "14.29.30133"
+                    }
+                  ]
+                },
+                "version": {
+                  "version": "16.11.35931.194"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "command",
+          "source": "vswhere -products * -format json -utf8",
+          "exit_code": 0,
+          "excerpt": "[\r\n  {\r\n    \"instanceId\": \"167a8d60\",\r\n    \"installDate\": \"2025-04-18T13:35:45Z\",\r\n    \"installationName\": \"VisualStudio/16.11.46+35931.194\",\r\n    \"installationPath\": \"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\2019\\\\BuildTools\",\r\n    \"installationVersion\": \"16.11.35931.194\",\r\n    \"productId\": \"Microsoft.VisualStudio.Product.BuildTools\",\r\n    \"productPath\": \"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\2019\\\\BuildTools\\\\Common7\\\\Tools\\\\LaunchDevCmd.bat\",\r\n    \"state\": 4294967295,\r\n    \"isComplete\": true,\r\n    \"isLaunchable\": true,\r\n    \"isPrerelease\": false,\r\n    \"isRebootRequired\": false,\r\n    \"displayName\": \"Visual Studio 生成工具 2019\",\r\n    \"description\": \"Visual Studio 生成工具允许生成本机和基于 MSBuild 的托管 .NET 应用程序，而不需要 Visual Studio IDE。还可以选择安装 Visual C++ 编译器和库、MFC、ALT 和 C++/CLI 支持。\",\r\n    \"channelId\": \"VisualStudio.16.Release\",\r\n    \"channelUri\": \"https://aka.ms/vs/16/release/channel\",\r\n    \"enginePath\": \"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\Installer\\\\resources\\\\app\\\\ServiceHub\\\\Services\\\\Microsoft.VisualStudio.Setup.Service\",\r\n    \"installedChannelId\": \"VisualStudio.16.Release\",\r\n    \"installedChannelUri\": \"https://aka.ms/vs/16/release/channel\",\r\n    \"releaseNotes\": \"https://docs.microsoft.com/en-us/visualstudio/releases/2019/release-notes-v16.11#16.11.46\",\r\n    \"resolvedInstallationPath\": \"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\2019\\\\BuildTools\",\r\n    \"thirdPartyNotices\": \"https://go.microsoft.com/fwlink/?LinkId=660909\",\r\n    \"updateDate\": \"2025-04-18T13:35:45.4900318Z\",\r\n    \"catalog\": {\r\n      \"buildBranch\": \"d16.11\",\r\n      \"buildVersion\": \"16.11.35931.194\",\r\n      \"id\": \"VisualStudio/16.11.46+35931.194\",\r\n      \"localBuild\": \"build-lab\",\r\n      \"manifestName\": \"VisualStudio\",\r\n      \"manifestType\": \"installer\",\r\n      \"productDisplayVersion\": \"16.11.46\",\r\n      \"productLine\": \"Dev16\",\r\n      \"productLineVersion\": \"2019\",\r\n      \"productM"
+        }
+      ],
+      "elapsed_ms": 121
+    },
+    "toolchain.node": {
+      "id": "toolchain.node",
+      "layer": "toolchain",
+      "title": "Node.js",
+      "status": "ok",
+      "summary": "Node.js",
+      "facts": {
+        "executables": {
+          "set": [
+            {
+              "path": "C:\\Program Files\\nodejs\\node.EXE"
+            },
+            {
+              "path": "C:\\Users\\<user>\\AppData\\Roaming\\nvm\\v24.5.0\\node.EXE"
+            }
+          ]
+        },
+        "versions": {
+          "map": {
+            "primary": {
+              "version": "24.5.0"
+            }
+          }
+        }
+      },
+      "volatile": {},
+      "evidence": [],
+      "elapsed_ms": 0
+    },
+    "toolchain.npm-family": {
+      "id": "toolchain.npm-family",
+      "layer": "toolchain",
+      "title": "npm 家族",
+      "status": "ok",
+      "summary": "npm 10.9.2",
+      "facts": {
+        "corepack_enabled": {
+          "bool": true
+        },
+        "npm_prefix": {
+          "path": "C:\\Users\\<user>\\AppData\\Roaming\\npm"
+        },
+        "npm_registry": {
+          "str": "https://registry.npmmirror.com"
+        },
+        "npm_version": {
+          "version": "10.9.2"
+        },
+        "pnpm_version": {
+          "version": "10.33.0"
+        },
+        "yarn_version": {
+          "version": "1.22.21"
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "command",
+          "source": "npm --version",
+          "exit_code": 0,
+          "excerpt": "10.9.2\n"
+        },
+        {
+          "kind": "command",
+          "source": "npm config get prefix",
+          "exit_code": 0,
+          "excerpt": "C:\\Users\\<user>\\AppData\\Roaming\\npm\n"
+        },
+        {
+          "kind": "command",
+          "source": "npm config get registry",
+          "exit_code": 0,
+          "excerpt": "https://registry.npmmirror.com\n"
+        },
+        {
+          "kind": "command",
+          "source": "pnpm --version",
+          "exit_code": 0,
+          "excerpt": "10.33.0\n"
+        },
+        {
+          "kind": "command",
+          "source": "yarn --version",
+          "exit_code": 0,
+          "excerpt": "1.22.21\n"
+        },
+        {
+          "kind": "command",
+          "source": "bun --version",
+          "exit_code": 1,
+          "excerpt": ""
+        },
+        {
+          "kind": "command",
+          "source": "corepack --version",
+          "exit_code": 0,
+          "excerpt": "0.31.0\n"
+        }
+      ],
+      "elapsed_ms": 3457
+    },
+    "toolchain.python": {
+      "id": "toolchain.python",
+      "layer": "toolchain",
+      "title": "Python",
+      "status": "ok",
+      "summary": "Python 3.12.7",
+      "facts": {
+        "py_launcher_version": {
+          "version": "3.11.9"
+        },
+        "python_paths": {
+          "set": [
+            {
+              "path": "C:\\Users\\<user>\\.uking\\runtime\\python\\python.EXE"
+            },
+            {
+              "path": "Y:\\compare-upstream\\hermes-home\\hermes-agent\\venv\\Scripts\\python.EXE"
+            },
+            {
+              "path": "C:\\Users\\<user>\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\python.EXE"
+            },
+            {
+              "path": "C:\\Users\\<user>\\AppData\\Local\\Programs\\Python\\Python311\\python.EXE"
+            },
+            {
+              "path": "C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WindowsApps\\python.EXE"
+            }
+          ]
+        },
+        "python_version": {
+          "version": "3.12.7"
+        },
+        "store_alias_shadow": {
+          "bool": false
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "command",
+          "source": "python --version",
+          "exit_code": 0,
+          "excerpt": "Python 3.12.7\r\n"
+        },
+        {
+          "kind": "command",
+          "source": "py --version",
+          "exit_code": 0,
+          "excerpt": "Python 3.11.9\r\n"
+        }
+      ],
+      "elapsed_ms": 242
+    },
+    "toolchain.rust": {
+      "id": "toolchain.rust",
+      "layer": "toolchain",
+      "title": "Rust",
+      "status": "ok",
+      "summary": "active stable-x86_64-pc-windows-msvc",
+      "facts": {
+        "active_toolchain": {
+          "str": "stable-x86_64-pc-windows-msvc"
+        },
+        "cargo_paths": {
+          "set": [
+            {
+              "path": "C:\\Users\\<user>\\.cargo\\bin\\cargo.EXE"
+            },
+            {
+              "path": "C:\\Program Files\\Rust stable MSVC 1.88\\bin\\cargo.EXE"
+            }
+          ]
+        }
+      },
+      "volatile": {},
+      "evidence": [],
+      "elapsed_ms": 0
+    },
+    "toolchain.windows-sdk": {
+      "id": "toolchain.windows-sdk",
+      "layer": "toolchain",
+      "title": "Windows SDK",
+      "status": "ok",
+      "summary": "1 个 SDK 版本，最新 10.0.19041.0",
+      "facts": {
+        "sdk_root": {
+          "path": "C:\\Program Files (x86)\\Windows Kits\\10"
+        },
+        "versions": {
+          "set": [
+            {
+              "str": "10.0.19041.0"
+            }
+          ]
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "registry",
+          "source": "SOFTWARE\\WOW6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v10.0\\InstallationFolder",
+          "exit_code": null,
+          "excerpt": "C:\\Program Files (x86)\\Windows Kits\\10\\"
+        }
+      ],
+      "elapsed_ms": 0
+    },
+    "windows.developer-mode": {
+      "id": "windows.developer-mode",
+      "layer": "host",
+      "title": "开发者模式",
+      "status": "ok",
+      "summary": "开发者模式已开启",
+      "facts": {
+        "enabled": {
+          "bool": true
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "registry",
+          "source": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock\\AllowDevelopmentWithoutDevLicense",
+          "exit_code": null,
+          "excerpt": "1"
+        }
+      ],
+      "elapsed_ms": 0
+    },
+    "windows.locale": {
+      "id": "windows.locale",
+      "layer": "host",
+      "title": "系统区域与代码页",
+      "status": "ok",
+      "summary": "ACP 936 / OEM 936 / locale zh-CN",
+      "facts": {
+        "acp": {
+          "str": "936"
+        },
+        "oem_cp": {
+          "str": "936"
+        },
+        "system_locale": {
+          "str": "zh-CN"
+        },
+        "utf8_beta": {
+          "bool": false
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "registry",
+          "source": "SYSTEM\\CurrentControlSet\\Control\\Nls\\CodePage\\ACP",
+          "exit_code": null,
+          "excerpt": "936"
+        },
+        {
+          "kind": "registry",
+          "source": "SYSTEM\\CurrentControlSet\\Control\\Nls\\CodePage\\OEMCP",
+          "exit_code": null,
+          "excerpt": "936"
+        },
+        {
+          "kind": "command",
+          "source": "cmd /c chcp",
+          "exit_code": 0,
+          "excerpt": "活动代码页: 936\r\n"
+        },
+        {
+          "kind": "command",
+          "source": "powershell -NoProfile -Command (Get-WinSystemLocale).Name",
+          "exit_code": 0,
+          "excerpt": "zh-CN\r\n"
+        }
+      ],
+      "elapsed_ms": 1648
+    },
+    "windows.long-paths": {
+      "id": "windows.long-paths",
+      "layer": "host",
+      "title": "长路径",
+      "status": "ok",
+      "summary": "未开启",
+      "facts": {
+        "enabled": {
+          "bool": false
+        }
+      },
+      "volatile": {},
+      "evidence": [],
+      "elapsed_ms": 0
+    },
+    "windows.powershell": {
+      "id": "windows.powershell",
+      "layer": "host",
+      "title": "PowerShell 版本",
+      "status": "ok",
+      "summary": "Windows PowerShell 5.1.22621.6133 / PowerShell 7+ 7.6.4",
+      "facts": {
+        "pwsh_path": {
+          "path": "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.6.4.0_x64__8wekyb3d8bbwe\\pwsh.EXE"
+        },
+        "pwsh_version": {
+          "version": "7.6.4"
+        },
+        "wps_version": {
+          "version": "5.1.22621.6133"
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "command",
+          "source": "powershell -NoProfile -Command $PSVersionTable.PSVersion.ToString()",
+          "exit_code": 0,
+          "excerpt": "5.1.22621.6133\r\n"
+        },
+        {
+          "kind": "command",
+          "source": "pwsh -NoProfile -Command $PSVersionTable.PSVersion.ToString()",
+          "exit_code": 0,
+          "excerpt": "7.6.4\r\n"
+        }
+      ],
+      "elapsed_ms": 1418
+    },
+    "windows.version": {
+      "id": "windows.version",
+      "layer": "host",
+      "title": "Windows 版本信息",
+      "status": "ok",
+      "summary": "Windows 11 Home build 22631",
+      "facts": {
+        "architecture": {
+          "str": "x64"
+        },
+        "build": {
+          "int": 22631
+        },
+        "display_version": {
+          "str": "23H2"
+        },
+        "edition": {
+          "str": "Core"
+        },
+        "product_name": {
+          "str": "Windows 11 Home"
+        },
+        "product_name_raw": {
+          "str": "Windows 10 Home"
+        },
+        "ubr": {
+          "int": 6199
+        },
+        "version": {
+          "str": "10.0.22631"
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "registry",
+          "source": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProductName",
+          "exit_code": null,
+          "excerpt": "Windows 10 Home"
+        },
+        {
+          "kind": "registry",
+          "source": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\CurrentBuild",
+          "exit_code": null,
+          "excerpt": "22631"
+        },
+        {
+          "kind": "registry",
+          "source": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\UBR",
+          "exit_code": null,
+          "excerpt": "6199"
+        },
+        {
+          "kind": "registry",
+          "source": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\EditionID",
+          "exit_code": null,
+          "excerpt": "Core"
+        },
+        {
+          "kind": "registry",
+          "source": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\DisplayVersion",
+          "exit_code": null,
+          "excerpt": "23H2"
+        }
+      ],
+      "elapsed_ms": 0
+    },
+    "wsl.status": {
+      "id": "wsl.status",
+      "layer": "host",
+      "title": "WSL 状态",
+      "status": "ok",
+      "summary": "WSL 已安装, 默认版本 2, 1 个发行版",
+      "facts": {
+        "default_version": {
+          "str": "2"
+        },
+        "distros": {
+          "set": [
+            {
+              "str": "Ubuntu"
+            }
+          ]
+        },
+        "installed": {
+          "bool": true
+        },
+        "kernel_version": {
+          "str": "5.15.167.4-1"
+        }
+      },
+      "volatile": {},
+      "evidence": [
+        {
+          "kind": "command",
+          "source": "wsl --status",
+          "exit_code": 0,
+          "excerpt": "默认分发: Ubuntu\r\n默认版本: 2\r\n"
+        },
+        {
+          "kind": "command",
+          "source": "wsl --list --verbose",
+          "exit_code": 0,
+          "excerpt": "  NAME      STATE           VERSION\r\n* Ubuntu    Stopped         2\r\n"
+        },
+        {
+          "kind": "command",
+          "source": "wsl --version",
+          "exit_code": 0,
+          "excerpt": "WSL 版本： 2.4.13.0\r\n内核版本： 5.15.167.4-1\r\nWSLg 版本： 1.0.65\r\nMSRDC 版本： 1.2.5716\r\nDirect3D 版本： 1.611.1-81528511\r\nDXCore 版本： 10.0.26100.1-240331-1435.ge-release\r\nWindows 版本： 10.0.22631.6199\r\n"
+        }
+      ],
+      "elapsed_ms": 316
+    }
+  },
+  "fingerprint": null
+}

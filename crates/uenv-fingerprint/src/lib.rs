@@ -1,13 +1,8 @@
-// uenv-fingerprint — 指纹计算 + diff。T0 仅建 crate，完整实现在 T4。
+// uenv-fingerprint — 指纹计算 + 环境差异（T4 实现）。
 
-/// 占位：待 T4 实现。
-pub fn compute_fingerprint(
-    _env: &uenv_core::Environment,
-) -> anyhow::Result<uenv_core::EnvironmentFingerprint> {
-    todo!("fingerprint computing — T4")
-}
+pub mod diff;
+pub mod fingerprint;
+pub mod normalize;
 
-/// 占位：待 T4 实现。
-pub fn diff(_a: &uenv_core::Environment, _b: &uenv_core::Environment) -> anyhow::Result<String> {
-    todo!("environment diff — T4")
-}
+pub use diff::{FactDiff, Risk, diff_environments, render_json, render_text};
+pub use fingerprint::{compute_fingerprint, short};
