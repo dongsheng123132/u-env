@@ -60,8 +60,14 @@ impl Detector for ProjectKind {
             };
         }
 
-        let kinds_set: Vec<FactValue> = kinds.iter().map(|k| FactValue::Str(k.to_string())).collect();
-        let markers_set: Vec<FactValue> = markers.iter().map(|m| FactValue::Str(m.to_string())).collect();
+        let kinds_set: Vec<FactValue> = kinds
+            .iter()
+            .map(|k| FactValue::Str(k.to_string()))
+            .collect();
+        let markers_set: Vec<FactValue> = markers
+            .iter()
+            .map(|m| FactValue::Str(m.to_string()))
+            .collect();
 
         let mut facts = BTreeMap::new();
         facts.insert("kinds".to_string(), FactValue::Set(kinds_set));
@@ -69,7 +75,7 @@ impl Detector for ProjectKind {
 
         DetectorResult {
             status: DetectStatus::Ok,
-            summary: format!("{}", kinds.join("+")),
+            summary: kinds.join("+"),
             facts,
             volatile: BTreeMap::new(),
             evidence: vec![],
@@ -100,8 +106,8 @@ pub fn detect_kinds(root: &Path) -> (Vec<String>, Vec<String>) {
     }
 
     // Tauri: tauri.conf.json 或 Cargo.toml 依赖 tauri
-    let tauri_conf = root.join("src-tauri/tauri.conf.json").is_file()
-        || root.join("tauri.conf.json").is_file();
+    let tauri_conf =
+        root.join("src-tauri/tauri.conf.json").is_file() || root.join("tauri.conf.json").is_file();
     if tauri_conf {
         kinds.push("tauri".to_string());
         markers.push(rel("tauri.conf.json"));
@@ -123,7 +129,12 @@ pub fn detect_kinds(root: &Path) -> (Vec<String>, Vec<String>) {
         markers.push(rel("electron-builder.yml"));
     }
     // forge.config.js / .ts / .cjs / .mjs
-    for name in ["forge.config.js", "forge.config.ts", "forge.config.cjs", "forge.config.mjs"] {
+    for name in [
+        "forge.config.js",
+        "forge.config.ts",
+        "forge.config.cjs",
+        "forge.config.mjs",
+    ] {
         if root.join(name).is_file() {
             kinds.push("electron".to_string());
             markers.push(rel(name));
@@ -137,12 +148,15 @@ pub fn detect_kinds(root: &Path) -> (Vec<String>, Vec<String>) {
     if !csproj.is_empty() || !sln.is_empty() {
         kinds.push("dotnet".to_string());
         if let Some(f) = csproj.first() {
-            markers.push(format!("{f}"));
+            markers.push(f.clone());
         } else if let Some(f) = sln.first() {
-            markers.push(format!("{f}"));
+            markers.push(f.clone());
         }
         // WinUi: csproj 引用 Microsoft.WindowsAppSDK
-        if csproj.iter().any(|f| csproj_refs_windowsappsdk(Path::new(f))) {
+        if csproj
+            .iter()
+            .any(|f| csproj_refs_windowsappsdk(Path::new(f)))
+        {
             kinds.push("winui".to_string());
             markers.push(format!("{} (WindowsAppSDK)", csproj[0]));
         }

@@ -9,7 +9,7 @@ use std::collections::BTreeMap;
 
 use uenv_core::{Cost, DetectStatus, EvidenceKind, FactValue, Layer};
 
-use crate::context::{evidence_from_command, ScanContext};
+use crate::context::{ScanContext, evidence_from_command};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 /// 工具名 → 版本命令
@@ -133,7 +133,7 @@ impl Detector for ProjectDrift {
                 &out,
             ));
 
-            let actual = parse_actual_version(*tool, &out.stdout);
+            let actual = parse_actual_version(tool, &out.stdout);
             let satisfied = match &actual {
                 Some(a) => version_satisfies(a, range),
                 None => Satisfied::Unknown,
@@ -202,11 +202,7 @@ fn parse_actual_version(tool: &str, stdout: &str) -> Option<String> {
             .unwrap_or_default(),
         _ => t.to_string(),
     };
-    if v.is_empty() {
-        None
-    } else {
-        Some(v)
-    }
+    if v.is_empty() { None } else { Some(v) }
 }
 
 /// 实际版本是否满足声明区间
@@ -234,21 +230,40 @@ fn version_satisfies(actual: &str, range: &str) -> Satisfied {
                 }
             }
         }
-        return if ge(act, lo_v) { Satisfied::Yes } else { Satisfied::No };
+        return if ge(act, lo_v) {
+            Satisfied::Yes
+        } else {
+            Satisfied::No
+        };
     }
     if let Some(hi) = range.strip_prefix("<=") {
         let hi_v = match parse_version(hi) {
             Some(v) => v,
             None => return Satisfied::Unknown,
         };
-        return if le(act, hi_v) { Satisfied::Yes } else { Satisfied::No };
+        return if le(act, hi_v) {
+            Satisfied::Yes
+        } else {
+            Satisfied::No
+        };
     }
 
     // 22.x / 22.* → >=22.0.0 <23.0.0（必须在精确匹配前判断，否则 "22.x" 会被 parse_version 吃掉）
-    if let Some(major_str) = range.strip_suffix(".x").or_else(|| range.strip_suffix(".*")) {
+    if let Some(major_str) = range
+        .strip_suffix(".x")
+        .or_else(|| range.strip_suffix(".*"))
+    {
         if let Ok(major) = major_str.trim().parse::<i64>() {
-            let lo = Version { major, minor: 0, patch: 0 };
-            let hi = Version { major: major + 1, minor: 0, patch: 0 };
+            let lo = Version {
+                major,
+                minor: 0,
+                patch: 0,
+            };
+            let hi = Version {
+                major: major + 1,
+                minor: 0,
+                patch: 0,
+            };
             return if ge(act, lo) && lt(act, hi) {
                 Satisfied::Yes
             } else {
@@ -260,7 +275,11 @@ fn version_satisfies(actual: &str, range: &str) -> Satisfied {
 
     // 精确：24.5.0
     if let Some(exact) = parse_version(range) {
-        return if eq(act, exact) { Satisfied::Yes } else { Satisfied::No };
+        return if eq(act, exact) {
+            Satisfied::Yes
+        } else {
+            Satisfied::No
+        };
     }
 
     // ^22.1.0 → >=22.1.0 <23.0.0
@@ -313,15 +332,28 @@ struct Version {
 /// 解析版本号：取前三个数字段；非数字尾（如 -beta）忽略
 fn parse_version(s: &str) -> Option<Version> {
     let s = s.trim();
-    let num_part = s.split(|c: char| !c.is_ascii_digit() && c != '.').next().unwrap_or("");
+    let num_part = s
+        .split(|c: char| !c.is_ascii_digit() && c != '.')
+        .next()
+        .unwrap_or("");
     let parts: Vec<&str> = num_part.split('.').collect();
     if parts.is_empty() || parts[0].is_empty() {
         return None;
     }
     let major = parts[0].parse::<i64>().ok()?;
-    let minor = parts.get(1).and_then(|p| p.parse::<i64>().ok()).unwrap_or(0);
-    let patch = parts.get(2).and_then(|p| p.parse::<i64>().ok()).unwrap_or(0);
-    Some(Version { major, minor, patch })
+    let minor = parts
+        .get(1)
+        .and_then(|p| p.parse::<i64>().ok())
+        .unwrap_or(0);
+    let patch = parts
+        .get(2)
+        .and_then(|p| p.parse::<i64>().ok())
+        .unwrap_or(0);
+    Some(Version {
+        major,
+        minor,
+        patch,
+    })
 }
 
 /// 版本比较
@@ -398,10 +430,22 @@ mod tests {
 
     #[test]
     fn actual_version_parsing() {
-        assert_eq!(parse_actual_version("node", "v22.14.0\r\n").as_deref(), Some("22.14.0"));
-        assert_eq!(parse_actual_version("rust", "rustc 1.88.0 (a1b2c3 2025-01-01)\r\n").as_deref(), Some("1.88.0"));
-        assert_eq!(parse_actual_version("python", "Python 3.12.7\r\n").as_deref(), Some("3.12.7"));
-        assert_eq!(parse_actual_version("npm", "10.9.2\r\n").as_deref(), Some("10.9.2"));
+        assert_eq!(
+            parse_actual_version("node", "v22.14.0\r\n").as_deref(),
+            Some("22.14.0")
+        );
+        assert_eq!(
+            parse_actual_version("rust", "rustc 1.88.0 (a1b2c3 2025-01-01)\r\n").as_deref(),
+            Some("1.88.0")
+        );
+        assert_eq!(
+            parse_actual_version("python", "Python 3.12.7\r\n").as_deref(),
+            Some("3.12.7")
+        );
+        assert_eq!(
+            parse_actual_version("npm", "10.9.2\r\n").as_deref(),
+            Some("10.9.2")
+        );
         assert_eq!(parse_actual_version("node", ""), None);
     }
 }

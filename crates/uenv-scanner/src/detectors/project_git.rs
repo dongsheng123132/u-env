@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 
 use uenv_core::{Cost, DetectStatus, EvidenceKind, FactValue, Layer};
 
-use crate::context::{evidence_from_command, ScanContext};
+use crate::context::{ScanContext, evidence_from_command};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct ProjectGit;
@@ -54,28 +54,45 @@ impl Detector for ProjectGit {
         }
 
         // 在项目根跑 git（git -C <root> 避免改 cwd）
-        let branch = ctx.run("git", &["-C", root.to_str().unwrap_or("."), "branch", "--show-current"]);
+        let branch = ctx.run(
+            "git",
+            &[
+                "-C",
+                root.to_str().unwrap_or("."),
+                "branch",
+                "--show-current",
+            ],
+        );
         evidence.push(evidence_from_command(
             EvidenceKind::Command,
             "git branch --show-current",
             &branch,
         ));
 
-        let head = ctx.run("git", &["-C", root.to_str().unwrap_or("."), "rev-parse", "HEAD"]);
+        let head = ctx.run(
+            "git",
+            &["-C", root.to_str().unwrap_or("."), "rev-parse", "HEAD"],
+        );
         evidence.push(evidence_from_command(
             EvidenceKind::Command,
             "git rev-parse HEAD",
             &head,
         ));
 
-        let status = ctx.run("git", &["-C", root.to_str().unwrap_or("."), "status", "--porcelain"]);
+        let status = ctx.run(
+            "git",
+            &["-C", root.to_str().unwrap_or("."), "status", "--porcelain"],
+        );
         evidence.push(evidence_from_command(
             EvidenceKind::Command,
             "git status --porcelain",
             &status,
         ));
 
-        let submodules = ctx.run("git", &["-C", root.to_str().unwrap_or("."), "submodule", "status"]);
+        let submodules = ctx.run(
+            "git",
+            &["-C", root.to_str().unwrap_or("."), "submodule", "status"],
+        );
         evidence.push(evidence_from_command(
             EvidenceKind::Command,
             "git submodule status",
@@ -111,7 +128,11 @@ impl Detector for ProjectGit {
                 DetectStatus::Ok,
                 format!(
                     "{}{}",
-                    if b.is_empty() { "detached HEAD".to_string() } else { b },
+                    if b.is_empty() {
+                        "detached HEAD".to_string()
+                    } else {
+                        b
+                    },
                     if dirty { " (dirty)" } else { "" }
                 ),
             )
@@ -129,6 +150,7 @@ impl Detector for ProjectGit {
 
 /// 解析 git 输出 —— 与 IO 分离，独立可测。
 /// remote URL 已在 ScanContext 层脱敏。
+#[allow(clippy::too_many_arguments)]
 pub fn parse_git(
     branch_out: &str,
     branch_ran: bool,
@@ -178,11 +200,29 @@ mod tests {
 
     #[test]
     fn parse_clean_branch() {
-        let facts = parse_git("main\n", true, "abc123def4567890\n", true, "", true, "", true);
-        assert_eq!(facts.get("branch").unwrap(), &FactValue::Str("main".to_string()));
-        assert_eq!(facts.get("commit").unwrap(), &FactValue::Str("abc123def456".to_string()));
+        let facts = parse_git(
+            "main\n",
+            true,
+            "abc123def4567890\n",
+            true,
+            "",
+            true,
+            "",
+            true,
+        );
+        assert_eq!(
+            facts.get("branch").unwrap(),
+            &FactValue::Str("main".to_string())
+        );
+        assert_eq!(
+            facts.get("commit").unwrap(),
+            &FactValue::Str("abc123def456".to_string())
+        );
         assert_eq!(facts.get("dirty").unwrap(), &FactValue::Bool(false));
-        assert_eq!(facts.get("has_submodules").unwrap(), &FactValue::Bool(false));
+        assert_eq!(
+            facts.get("has_submodules").unwrap(),
+            &FactValue::Bool(false)
+        );
     }
 
     #[test]
@@ -205,7 +245,10 @@ mod tests {
     fn parse_detached_head() {
         let facts = parse_git("", true, "abc\n", true, "", true, "", true);
         assert!(!facts.contains_key("branch"));
-        assert_eq!(facts.get("commit").unwrap(), &FactValue::Str("abc".to_string()));
+        assert_eq!(
+            facts.get("commit").unwrap(),
+            &FactValue::Str("abc".to_string())
+        );
     }
 
     #[test]

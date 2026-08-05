@@ -85,15 +85,9 @@ impl Detector for ProjectLockfiles {
         }
 
         let (status, summary) = if lockfiles.is_empty() {
-            (
-                DetectStatus::Ok,
-                "未发现 lockfile".to_string(),
-            )
+            (DetectStatus::Ok, "未发现 lockfile".to_string())
         } else {
-            (
-                DetectStatus::Ok,
-                format!("{} 个 lockfile", lockfiles.len()),
-            )
+            (DetectStatus::Ok, format!("{} 个 lockfile", lockfiles.len()))
         };
 
         let mut facts = BTreeMap::new();

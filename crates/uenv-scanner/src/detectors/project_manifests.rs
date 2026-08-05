@@ -225,11 +225,7 @@ pub fn parse_cargo_toml(content: &str) -> Option<String> {
 
 fn truncate_redacted(content: &str, ctx: &ScanContext) -> String {
     let s = truncate(content, 2000);
-    if ctx.redact {
-        ctx.redact(&s)
-    } else {
-        s
-    }
+    if ctx.redact { ctx.redact(&s) } else { s }
 }
 
 fn truncate(s: &str, max: usize) -> String {

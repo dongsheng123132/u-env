@@ -9,11 +9,7 @@ impl Adapter for ElectronAdapter {
     fn meta(&self) -> AdapterMeta {
         AdapterMeta {
             id: "electron",
-            required_capabilities: &[
-                "desktop-ui",
-                "embedded-web-renderer",
-                "native-toolchain",
-            ],
+            required_capabilities: &["desktop-ui", "embedded-web-renderer", "native-toolchain"],
             relevant_detectors: &[
                 "toolchain.npm-family",
                 "toolchain.node",

@@ -64,7 +64,12 @@ mod tests {
     fn fake_env(kinds: &[&str]) -> Environment {
         let facts = BTreeMap::from([(
             "kinds".to_string(),
-            FactValue::Set(kinds.iter().map(|k| FactValue::Str(k.to_string())).collect()),
+            FactValue::Set(
+                kinds
+                    .iter()
+                    .map(|k| FactValue::Str(k.to_string()))
+                    .collect(),
+            ),
         )]);
         let record = DetectorRecord {
             id: "project.kind".to_string(),
