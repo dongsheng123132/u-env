@@ -51,6 +51,21 @@ impl ScanContext {
     /// 唯一允许的外部命令调用入口。必须带超时、捕获退出码、
     /// 处理 GBK/UTF-8/UTF-16 输出。
     pub fn run(&self, program: &str, args: &[&str]) -> CommandOutcome {
+        self.run_with_timeout(program, args, self.timeout)
+    }
+
+    /// 慢命令专用入口：npm/dotnet/vswhere 等启动慢的，单独放宽到 20s。
+    /// 与 run() 共用同一套超时/解码/脱敏逻辑。
+    pub fn run_slow(&self, program: &str, args: &[&str]) -> CommandOutcome {
+        self.run_with_timeout(program, args, Duration::from_secs(20))
+    }
+
+    fn run_with_timeout(
+        &self,
+        program: &str,
+        args: &[&str],
+        timeout: Duration,
+    ) -> CommandOutcome {
         let start = Instant::now();
 
         let mut child = match Command::new(program)
@@ -75,7 +90,7 @@ impl ScanContext {
 
         // 轮询等待完成或超时（std 没有 wait_timeout，用 try_wait + sleep）
         let poll_interval = Duration::from_millis(100);
-        let deadline = start + self.timeout;
+        let deadline = start + timeout;
 
         loop {
             match child.try_wait() {
@@ -161,7 +176,7 @@ impl ScanContext {
                 stdout: stdout_s,
                 stderr: format!(
                     "timed out after {:.0}s\n{}",
-                    self.timeout.as_secs_f64(),
+                    timeout.as_secs_f64(),
                     stderr_s
                 ),
                 timed_out: true,

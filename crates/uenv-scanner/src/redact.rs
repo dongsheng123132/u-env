@@ -7,19 +7,47 @@ pub fn redact(s: &str) -> String {
     let mut result = s.to_string();
 
     // 1. 用户名路径 C:\Users\XXX → C:\Users\<user>
-    if let Ok(user) = env::var("USERNAME") {
-        if !user.is_empty() {
-            let pattern = format!("\\Users\\{user}");
-            let replacement = "\\Users\\<user>";
-            // 大小写不敏感替换
-            result = replace_case_insensitive(&result, &pattern, replacement);
+    // ⚠️ 候选用户名：优先 USERPROFILE 的目录名（真实用户目录），
+    //    git-bash 里 USERNAME 可能不同（如 USERNAME=sen 但目录是 <user>）。
+    let profile_dir = env::var("USERPROFILE")
+        .ok()
+        .filter(|h| !h.is_empty())
+        .and_then(|h| {
+            h.trim_end_matches(['\\', '/'])
+                .rsplit(['\\', '/'])
+                .next()
+                .filter(|n| !n.is_empty())
+                .map(|n| n.to_string())
+        });
+    let username = env::var("USERNAME").ok().filter(|u| !u.is_empty());
+
+    let mut user_candidates: Vec<String> = Vec::new();
+    if let Some(d) = &profile_dir {
+        user_candidates.push(d.clone());
+    }
+    if let Some(u) = &username {
+        if !user_candidates.iter().any(|c| c.eq_ignore_ascii_case(u)) {
+            user_candidates.push(u.clone());
         }
     }
 
-    // 2. HOME / USERPROFILE 路径
+    for user in &user_candidates {
+        let pattern = format!("\\Users\\{user}");
+        let replacement = "\\Users\\<user>";
+        result = replace_case_insensitive(&result, &pattern, &replacement);
+
+        // 1b. 正斜杠版本：git 等工具输出 C:/Users/XXX（Windows 上分隔符不统一）
+        let pattern_fwd = format!("/Users/{user}");
+        let replacement_fwd = "/Users/<user>";
+        result = replace_case_insensitive(&result, &pattern_fwd, &replacement_fwd);
+    }
+
+    // 2. HOME / USERPROFILE 路径（反斜杠 + 正斜杠两个形态）
     if let Ok(home) = env::var("USERPROFILE") {
         if !home.is_empty() {
             result = replace_case_insensitive(&result, &home, "<user>");
+            let home_fwd = home.replace('\\', "/");
+            result = replace_case_insensitive(&result, &home_fwd, "<user>");
         }
     }
 
@@ -32,6 +60,9 @@ pub fn redact(s: &str) -> String {
 
     // 4. 密钥样式串：sk-... / ghp_... / 等
     result = redact_secrets(&result);
+
+    // 4.5 邮箱：git config 的 user.email 等（38004547@qq.com → <redacted>）
+    result = redact_emails(&result);
 
     // 5. 代理 URL 中的账号密码
     result = redact_proxy_auth(&result);
@@ -110,6 +141,84 @@ fn redact_pattern(s: &str, prefix: &str, max_len: usize) -> String {
     }
 
     result
+}
+
+/// 邮箱 → <redacted>。git config --list --show-origin 会输出 user.email，
+/// 报告是要上传的，邮箱也属于隐私。
+/// 启发式：local@domain，local 用 [\w.%+-]，domain 用 [\w.-] 且必须含字母和至少一个点。
+/// 不命中：纯 IP 域名（127.0.0.1）、URL 认证样式（user:pass@host —— 那是代理规则的事）。
+fn redact_emails(s: &str) -> String {
+    let chars: Vec<char> = s.chars().collect();
+    let n = chars.len();
+    let mut spans: Vec<(usize, usize)> = Vec::new(); // [start, end) char 区间，左闭右开
+
+    let mut i = 0;
+    while i < n {
+        if chars[i] == '@' {
+            // 域名：@ 后跟 [\w.-]+，至少一个点 + 至少一个字母
+            let mut j = i + 1;
+            let mut has_dot = false;
+            let mut has_letter = false;
+            while j < n
+                && (chars[j].is_ascii_alphanumeric() || chars[j] == '.' || chars[j] == '-')
+            {
+                if chars[j] == '.' {
+                    has_dot = true;
+                }
+                if chars[j].is_ascii_alphabetic() {
+                    has_letter = true;
+                }
+                j += 1;
+            }
+            // local part：@ 前跟 [\w.%+-]
+            let mut k = i;
+            while k > 0 {
+                let prev = chars[k - 1];
+                if prev.is_ascii_alphanumeric() || prev == '.' || prev == '%' || prev == '+' || prev == '-'
+                {
+                    k -= 1;
+                } else {
+                    break;
+                }
+            }
+            let local_start = k;
+            let local_len = i - local_start;
+            let local_ok = local_len >= 1 && !matches!(chars[i - 1], '.' | '%' | '+' | '-');
+            let domain_len = j - i - 1;
+
+            if local_ok && has_dot && has_letter && domain_len >= 3 {
+                // 防误伤 URL 认证：local part 紧邻 ':'（user:pass@）或 '//'（scheme://）
+                let before = if local_start > 0 {
+                    chars[local_start - 1]
+                } else {
+                    '\0'
+                };
+                let before_scheme = local_start >= 2
+                    && chars[local_start - 2] == '/'
+                    && chars[local_start - 1] == '/';
+                if before != ':' && !before_scheme {
+                    spans.push((local_start, j));
+                    i = j;
+                    continue;
+                }
+            }
+        }
+        i += 1;
+    }
+
+    // 按区间拼接（区间不重叠）
+    let mut out = String::with_capacity(s.len());
+    let mut last = 0;
+    for (a, b) in spans {
+        if a < last {
+            continue; // 已被前一个区间覆盖
+        }
+        out.extend(chars[last..a].iter());
+        out.push_str("<redacted>");
+        last = b;
+    }
+    out.extend(chars[last..].iter());
+    out
 }
 
 fn redact_proxy_auth(s: &str) -> String {
@@ -206,6 +315,36 @@ mod tests {
         let out = redact(input);
         assert!(out.contains("<redacted>@"), "got: {out}");
         assert!(!out.contains("pass123"), "got: {out}");
+    }
+
+    /// git config 的 user.email 必须脱敏
+    #[test]
+    fn git_email_redacted() {
+        let input = "file:C:/Users/me/.gitconfig\tuser.email=38004547@qq.com";
+        let out = redact(input);
+        assert!(!out.contains("38004547"), "got: {out}");
+        assert!(out.contains("<redacted>"), "got: {out}");
+    }
+
+    /// 纯 IP 代理 URL 不能被邮箱规则误伤
+    #[test]
+    fn proxy_url_ip_not_email() {
+        let input = "http.proxy=http://127.0.0.1:7897";
+        let out = redact(input);
+        // 127.0.0.1 有多个点，但 @ 前面没有 local part → 不是邮箱
+        assert_eq!(out, "http.proxy=http://127.0.0.1:7897");
+    }
+
+    /// git 输出用正斜杠路径（C:/Users/XXX），也必须脱敏
+    #[test]
+    fn forward_slash_user_path_redacted() {
+        let user = std::env::var("USERNAME").unwrap_or_else(|_| "testuser".to_string());
+        let input = format!("safe.directory=C:/Users/{user}/proj");
+        let out = redact(&input);
+        assert!(out.contains("C:/Users/<user>/proj"), "got: {out}");
+        if user != "testuser" {
+            assert!(!out.contains(&user), "got: {out}");
+        }
     }
 
     /// which_all 脱敏后必须保持可比性：同一路径每次都产出同样的结果
