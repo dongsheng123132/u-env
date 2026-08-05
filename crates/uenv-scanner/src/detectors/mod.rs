@@ -6,6 +6,8 @@ pub mod path_analysis;
 pub mod security_defender;
 pub mod toolchain_git;
 pub mod toolchain_node;
+pub mod toolchain_npm_family;
+pub mod toolchain_python;
 pub mod windows_developer_mode;
 pub mod windows_locale;
 pub mod windows_long_paths;

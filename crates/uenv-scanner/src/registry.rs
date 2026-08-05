@@ -19,5 +19,7 @@ pub fn all_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(detectors::host_hardware::HostHardware),
         Box::new(detectors::path_analysis::PathAnalysis),
         Box::new(detectors::toolchain_git::ToolchainGit),
+        Box::new(detectors::toolchain_npm_family::ToolchainNpmFamily),
+        Box::new(detectors::toolchain_python::ToolchainPython),
     ]
 }
