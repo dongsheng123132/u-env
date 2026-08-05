@@ -12,5 +12,7 @@ pub fn all_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(detectors::windows_long_paths::WindowsLongPaths),
         Box::new(detectors::windows_locale::WindowsLocale),
         Box::new(detectors::wsl_status::WslStatus),
+        Box::new(detectors::fs_project_location::FsProjectLocation),
+        Box::new(detectors::security_defender::SecurityDefender),
     ]
 }

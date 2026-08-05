@@ -1,3 +1,5 @@
+pub mod fs_project_location;
+pub mod security_defender;
 pub mod toolchain_node;
 pub mod windows_developer_mode;
 pub mod windows_locale;
