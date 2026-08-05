@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 use uenv_core::{Cost, DetectStatus, Evidence, EvidenceKind, FactValue, Layer};
 use winreg::enums::HKEY_CURRENT_USER;
 
-use crate::context::{evidence_from_command, evidence_from_registry, ScanContext};
+use crate::context::{ScanContext, evidence_from_command, evidence_from_registry};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct NetProxy;
@@ -106,9 +106,21 @@ impl Detector for NetProxy {
 
         let facts = parse_proxy(
             system_proxy.as_deref(),
-            if env_http.is_empty() { None } else { Some(&env_http) },
-            if env_https.is_empty() { None } else { Some(&env_https) },
-            if no_proxy.is_empty() { None } else { Some(&no_proxy) },
+            if env_http.is_empty() {
+                None
+            } else {
+                Some(&env_http)
+            },
+            if env_https.is_empty() {
+                None
+            } else {
+                Some(&env_https)
+            },
+            if no_proxy.is_empty() {
+                None
+            } else {
+                Some(&no_proxy)
+            },
             npm_proxy.as_deref(),
             git_proxy.as_deref(),
         );
@@ -211,10 +223,7 @@ mod tests {
             Some("http://127.0.0.1:7897"),
             Some("http://127.0.0.1:7897"),
         );
-        assert_eq!(
-            facts.get("consistent").unwrap(),
-            &FactValue::Bool(true)
-        );
+        assert_eq!(facts.get("consistent").unwrap(), &FactValue::Bool(true));
         assert_eq!(
             facts.get("system_proxy").unwrap(),
             &FactValue::Str("127.0.0.1:7897".to_string())
@@ -231,20 +240,14 @@ mod tests {
             None,
             None,
         );
-        assert_eq!(
-            facts.get("consistent").unwrap(),
-            &FactValue::Bool(false)
-        );
+        assert_eq!(facts.get("consistent").unwrap(), &FactValue::Bool(false));
     }
 
     #[test]
     fn parse_none_consistent() {
         // 都没设置 → 一致（true）
         let facts = parse_proxy(None, None, None, None, None, None);
-        assert_eq!(
-            facts.get("consistent").unwrap(),
-            &FactValue::Bool(true)
-        );
+        assert_eq!(facts.get("consistent").unwrap(), &FactValue::Bool(true));
         assert!(!facts.contains_key("system_proxy"));
     }
 
@@ -252,16 +255,19 @@ mod tests {
     fn parse_system_disabled() {
         // 系统代理未启用 → system_proxy 省略，与 env 比较：env 有值 → 不一致
         let facts = parse_proxy(None, Some("http://127.0.0.1:7897"), None, None, None, None);
-        assert_eq!(
-            facts.get("consistent").unwrap(),
-            &FactValue::Bool(false)
-        );
+        assert_eq!(facts.get("consistent").unwrap(), &FactValue::Bool(false));
     }
 
     #[test]
     fn normalize_with_auth() {
-        assert_eq!(normalize_proxy(Some("http://user:pass@127.0.0.1:7897")), "127.0.0.1:7897");
-        assert_eq!(normalize_proxy(Some("http://<redacted>@127.0.0.1:7897")), "127.0.0.1:7897");
+        assert_eq!(
+            normalize_proxy(Some("http://user:pass@127.0.0.1:7897")),
+            "127.0.0.1:7897"
+        );
+        assert_eq!(
+            normalize_proxy(Some("http://<redacted>@127.0.0.1:7897")),
+            "127.0.0.1:7897"
+        );
         assert_eq!(normalize_proxy(Some("127.0.0.1:7897")), "127.0.0.1:7897");
         assert_eq!(normalize_proxy(None), "");
     }

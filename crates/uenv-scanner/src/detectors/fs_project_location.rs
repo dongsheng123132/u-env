@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 
 use uenv_core::{Cost, DetectStatus, Evidence, EvidenceKind, FactValue, Layer};
 
-use crate::context::{evidence_from_command, ScanContext};
+use crate::context::{ScanContext, evidence_from_command};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct FsProjectLocation;
@@ -101,11 +101,7 @@ impl Detector for FsProjectLocation {
 
 /// 文件系统类型：fsutil fsinfo volumeinfo <drive> 优先，失败（非管理员/无权限）
 /// 退回 PowerShell Get-Volume。
-fn detect_filesystem(
-    ctx: &ScanContext,
-    drive: &str,
-    evidence: &mut Vec<Evidence>,
-) -> String {
+fn detect_filesystem(ctx: &ScanContext, drive: &str, evidence: &mut Vec<Evidence>) -> String {
     if !drive.is_empty() {
         let fsutil = ctx.run("fsutil", &["fsinfo", "volumeinfo", drive]);
         evidence.push(evidence_from_command(
@@ -134,7 +130,11 @@ fn detect_filesystem(
     } else {
         ctx.run(
             "powershell",
-            &["-NoProfile", "-Command", "Get-Volume | ConvertTo-Json -Compress"],
+            &[
+                "-NoProfile",
+                "-Command",
+                "Get-Volume | ConvertTo-Json -Compress",
+            ],
         )
     };
     evidence.push(evidence_from_command(
@@ -197,10 +197,7 @@ fn parse_volume_json(json: &str) -> Option<String> {
 }
 
 /// 解析逻辑与 IO 分离 —— 独立可测
-pub fn parse_project_location(
-    path: &str,
-    filesystem: &str,
-) -> BTreeMap<String, FactValue> {
+pub fn parse_project_location(path: &str, filesystem: &str) -> BTreeMap<String, FactValue> {
     let mut facts = BTreeMap::new();
 
     let drive = path
@@ -213,7 +210,10 @@ pub fn parse_project_location(
         facts.insert("drive".to_string(), FactValue::Str(drive));
     }
     if !filesystem.is_empty() {
-        facts.insert("filesystem".to_string(), FactValue::Str(filesystem.to_string()));
+        facts.insert(
+            "filesystem".to_string(),
+            FactValue::Str(filesystem.to_string()),
+        );
     }
 
     let lower = path.to_lowercase();
@@ -227,14 +227,20 @@ pub fn parse_project_location(
             .map(|od| !od.is_empty() && lower.starts_with(&od.to_lowercase()))
             .unwrap_or(false);
     // 非 ASCII（中文等）
-    let path_has_non_ascii = path.chars().any(|c| !c.is_ascii());
+    let path_has_non_ascii = !path.is_ascii();
     let path_has_space = path.contains(' ');
 
     facts.insert("on_onedrive".to_string(), FactValue::Bool(on_onedrive));
     facts.insert("on_network".to_string(), FactValue::Bool(on_network));
     facts.insert("on_wsl".to_string(), FactValue::Bool(on_wsl));
-    facts.insert("path_has_non_ascii".to_string(), FactValue::Bool(path_has_non_ascii));
-    facts.insert("path_has_space".to_string(), FactValue::Bool(path_has_space));
+    facts.insert(
+        "path_has_non_ascii".to_string(),
+        FactValue::Bool(path_has_non_ascii),
+    );
+    facts.insert(
+        "path_has_space".to_string(),
+        FactValue::Bool(path_has_space),
+    );
     facts
 }
 
@@ -245,7 +251,10 @@ mod tests {
     #[test]
     fn parse_local_c_drive() {
         let facts = parse_project_location(r"C:\Users\me\proj", "NTFS");
-        assert_eq!(facts.get("drive").unwrap(), &FactValue::Str("C:".to_string()));
+        assert_eq!(
+            facts.get("drive").unwrap(),
+            &FactValue::Str("C:".to_string())
+        );
         assert_eq!(
             facts.get("filesystem").unwrap(),
             &FactValue::Str("NTFS".to_string())
@@ -253,16 +262,31 @@ mod tests {
         assert_eq!(facts.get("on_onedrive").unwrap(), &FactValue::Bool(false));
         assert_eq!(facts.get("on_network").unwrap(), &FactValue::Bool(false));
         assert_eq!(facts.get("on_wsl").unwrap(), &FactValue::Bool(false));
-        assert_eq!(facts.get("path_has_non_ascii").unwrap(), &FactValue::Bool(false));
-        assert_eq!(facts.get("path_has_space").unwrap(), &FactValue::Bool(false));
+        assert_eq!(
+            facts.get("path_has_non_ascii").unwrap(),
+            &FactValue::Bool(false)
+        );
+        assert_eq!(
+            facts.get("path_has_space").unwrap(),
+            &FactValue::Bool(false)
+        );
     }
 
     #[test]
     fn parse_chinese_path_with_space() {
         let facts = parse_project_location(r"D:\uking编程\本境协议", "NTFS");
-        assert_eq!(facts.get("drive").unwrap(), &FactValue::Str("D:".to_string()));
-        assert_eq!(facts.get("path_has_non_ascii").unwrap(), &FactValue::Bool(true));
-        assert_eq!(facts.get("path_has_space").unwrap(), &FactValue::Bool(false));
+        assert_eq!(
+            facts.get("drive").unwrap(),
+            &FactValue::Str("D:".to_string())
+        );
+        assert_eq!(
+            facts.get("path_has_non_ascii").unwrap(),
+            &FactValue::Bool(true)
+        );
+        assert_eq!(
+            facts.get("path_has_space").unwrap(),
+            &FactValue::Bool(false)
+        );
     }
 
     #[test]
@@ -270,7 +294,7 @@ mod tests {
         let facts = parse_project_location(r"\\wsl$\Ubuntu\home\dev\proj", "9p");
         assert_eq!(facts.get("on_wsl").unwrap(), &FactValue::Bool(true));
         assert_eq!(facts.get("on_network").unwrap(), &FactValue::Bool(false));
-        assert_eq!(facts.get("drive").is_none(), true);
+        assert!(!facts.contains_key("drive"));
     }
 
     #[test]
@@ -292,10 +316,7 @@ mod tests {
             parse_fsutil("File System Name : NTFS").as_deref(),
             Some("NTFS")
         );
-        assert_eq!(
-            parse_fsutil("文件系统名称 : NTFS").as_deref(),
-            Some("NTFS")
-        );
+        assert_eq!(parse_fsutil("文件系统名称 : NTFS").as_deref(), Some("NTFS"));
         assert_eq!(parse_fsutil("nothing here"), None);
     }
 

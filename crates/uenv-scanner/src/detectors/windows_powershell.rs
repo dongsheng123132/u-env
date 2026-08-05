@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 
 use uenv_core::{Cost, DetectStatus, EvidenceKind, FactValue, Layer};
 
-use crate::context::{evidence_from_command, ScanContext};
+use crate::context::{ScanContext, evidence_from_command};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct WindowsPowerShell;
@@ -27,18 +27,28 @@ impl Detector for WindowsPowerShell {
 
         // Windows PowerShell 5.x（系统自带 powershell.exe）
         let wps_cmd = "powershell -NoProfile -Command $PSVersionTable.PSVersion.ToString()";
-        let wps = ctx.run("powershell", &["-NoProfile", "-Command", "$PSVersionTable.PSVersion.ToString()"]);
-        evidence.push(evidence_from_command(
-            EvidenceKind::Command,
-            wps_cmd,
-            &wps,
-        ));
+        let wps = ctx.run(
+            "powershell",
+            &[
+                "-NoProfile",
+                "-Command",
+                "$PSVersionTable.PSVersion.ToString()",
+            ],
+        );
+        evidence.push(evidence_from_command(EvidenceKind::Command, wps_cmd, &wps));
 
         let wps_version = parse_version_output(&wps);
 
         // PowerShell 7+（pwsh，可能未安装）
         let pwsh_cmd = "pwsh -NoProfile -Command $PSVersionTable.PSVersion.ToString()";
-        let pwsh = ctx.run("pwsh", &["-NoProfile", "-Command", "$PSVersionTable.PSVersion.ToString()"]);
+        let pwsh = ctx.run(
+            "pwsh",
+            &[
+                "-NoProfile",
+                "-Command",
+                "$PSVersionTable.PSVersion.ToString()",
+            ],
+        );
         evidence.push(evidence_from_command(
             EvidenceKind::Command,
             pwsh_cmd,
@@ -120,7 +130,10 @@ pub fn parse_powershell(
         facts.insert("wps_version".to_string(), FactValue::Version(v.to_string()));
     }
     if let Some(v) = pwsh_version {
-        facts.insert("pwsh_version".to_string(), FactValue::Version(v.to_string()));
+        facts.insert(
+            "pwsh_version".to_string(),
+            FactValue::Version(v.to_string()),
+        );
     }
     if let Some(p) = pwsh_path {
         facts.insert("pwsh_path".to_string(), FactValue::Path(p.to_string()));

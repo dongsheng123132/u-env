@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 
 use uenv_core::{Cost, DetectStatus, EvidenceKind, FactValue, Layer};
 
-use crate::context::{evidence_from_command, ScanContext};
+use crate::context::{ScanContext, evidence_from_command};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct WslStatus;
@@ -37,10 +37,7 @@ impl Detector for WslStatus {
             return DetectorResult {
                 status: DetectStatus::Ok,
                 summary: "WSL 未安装（wsl.exe 不在 PATH）".to_string(),
-                facts: BTreeMap::from([(
-                    "installed".to_string(),
-                    FactValue::Bool(false),
-                )]),
+                facts: BTreeMap::from([("installed".to_string(), FactValue::Bool(false))]),
                 volatile: BTreeMap::new(),
                 evidence,
             };
@@ -63,17 +60,9 @@ impl Detector for WslStatus {
             &version,
         ));
 
-        let facts = parse_wsl(
-            &status.stdout,
-            &list.stdout,
-            &version.stdout,
-            version.ran,
-        );
+        let facts = parse_wsl(&status.stdout, &list.stdout, &version.stdout, version.ran);
 
-        let installed = matches!(
-            facts.get("installed"),
-            Some(FactValue::Bool(true))
-        );
+        let installed = matches!(facts.get("installed"), Some(FactValue::Bool(true)));
         let default_version = facts
             .get("default_version")
             .map(|v| match v {
@@ -90,10 +79,7 @@ impl Detector for WslStatus {
             .unwrap_or(0);
 
         let (status, summary) = if !installed {
-            (
-                DetectStatus::Ok,
-                "WSL 已安装但未检测到发行版".to_string(),
-            )
+            (DetectStatus::Ok, "WSL 已安装但未检测到发行版".to_string())
         } else {
             (
                 DetectStatus::Ok,
@@ -147,16 +133,12 @@ pub fn parse_wsl(
     let mut distros = Vec::new();
     for line in list_out.lines() {
         let line = line.trim();
-        if line.is_empty()
-            || !line.contains("  ")
-            || line.to_lowercase().starts_with("name ")
-        {
+        if line.is_empty() || !line.contains("  ") || line.to_lowercase().starts_with("name ") {
             continue;
         }
         // 去掉 * 标记（默认发行版），取第一个 token
         let name = line
             .trim_start_matches('*')
-            .trim()
             .split_whitespace()
             .next()
             .unwrap_or("")
@@ -220,10 +202,7 @@ mod tests {
         let list = "  NAME      STATE           VERSION\r\n* Ubuntu    Stopped         2\r\n";
         let version = "WSL 版本： 2.4.13.0\r\n内核版本： 5.15.167.4-1\r\n";
         let facts = parse_wsl(status, list, version, true);
-        assert_eq!(
-            facts.get("installed").unwrap(),
-            &FactValue::Bool(true)
-        );
+        assert_eq!(facts.get("installed").unwrap(), &FactValue::Bool(true));
         assert_eq!(
             facts.get("default_version").unwrap(),
             &FactValue::Str("2".to_string())
@@ -259,10 +238,7 @@ mod tests {
     fn parse_not_installed() {
         // wsl.exe 不存在 → 空输出
         let facts = parse_wsl("", "", "", false);
-        assert_eq!(
-            facts.get("installed").unwrap(),
-            &FactValue::Bool(false)
-        );
+        assert_eq!(facts.get("installed").unwrap(), &FactValue::Bool(false));
         assert!(!facts.contains_key("default_version"));
         assert!(!facts.contains_key("distros"));
     }

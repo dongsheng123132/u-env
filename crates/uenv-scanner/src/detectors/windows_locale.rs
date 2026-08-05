@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 use uenv_core::{Cost, DetectStatus, EvidenceKind, FactValue, Layer};
 use winreg::enums::HKEY_LOCAL_MACHINE;
 
-use crate::context::{evidence_from_command, evidence_from_registry, ScanContext};
+use crate::context::{ScanContext, evidence_from_command, evidence_from_registry};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct WindowsLocale;
@@ -77,10 +77,7 @@ impl Detector for WindowsLocale {
                 ),
             )
         } else {
-            (
-                DetectStatus::Error,
-                "CodePage 注册表键读取失败".to_string(),
-            )
+            (DetectStatus::Error, "CodePage 注册表键读取失败".to_string())
         };
 
         DetectorResult {
@@ -104,10 +101,7 @@ pub fn parse_locale(
         if !a.is_empty() {
             facts.insert("acp".to_string(), FactValue::Str(a.to_string()));
             // UTF-8 beta 开关：ACP == 65001
-            facts.insert(
-                "utf8_beta".to_string(),
-                FactValue::Bool(a == "65001"),
-            );
+            facts.insert("utf8_beta".to_string(), FactValue::Bool(a == "65001"));
         }
     }
     if let Some(o) = oem_cp {
@@ -131,7 +125,10 @@ mod tests {
     fn parse_zh_cn_gbk() {
         // 中文系统：ACP=936, OEMCP=936, locale=zh-CN，UTF-8 beta 关
         let facts = parse_locale(Some("936"), Some("936"), Some("zh-CN"));
-        assert_eq!(facts.get("acp").unwrap(), &FactValue::Str("936".to_string()));
+        assert_eq!(
+            facts.get("acp").unwrap(),
+            &FactValue::Str("936".to_string())
+        );
         assert_eq!(
             facts.get("oem_cp").unwrap(),
             &FactValue::Str("936".to_string())

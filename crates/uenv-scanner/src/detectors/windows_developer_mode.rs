@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 use uenv_core::{Cost, DetectStatus, FactValue, Layer};
 use winreg::enums::HKEY_LOCAL_MACHINE;
 
-use crate::context::{evidence_from_registry, ScanContext};
+use crate::context::{ScanContext, evidence_from_registry};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct WindowsDeveloperMode;
@@ -27,8 +27,7 @@ impl Detector for WindowsDeveloperMode {
         let name = "AllowDevelopmentWithoutDevLicense";
 
         let value = ctx.reg_read(HKEY_LOCAL_MACHINE, path, name);
-        let mut evidence = Vec::new();
-        evidence.push(evidence_from_registry(path, name, &value));
+        let evidence = vec![evidence_from_registry(path, name, &value)];
 
         let mut facts = BTreeMap::new();
         let enabled = parse_dword_bool(&value);
@@ -46,10 +45,7 @@ impl Detector for WindowsDeveloperMode {
                 },
             )
         } else {
-            (
-                DetectStatus::Ok,
-                "注册表键缺失，视为未开启".to_string(),
-            )
+            (DetectStatus::Ok, "注册表键缺失，视为未开启".to_string())
         };
 
         DetectorResult {

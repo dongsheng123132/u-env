@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 
 use uenv_core::{Cost, DetectStatus, EvidenceKind, FactValue, Layer};
 
-use crate::context::{evidence_from_command, ScanContext};
+use crate::context::{ScanContext, evidence_from_command};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct HostDisk;
@@ -31,12 +31,11 @@ impl Detector for HostDisk {
                 "Get-Volume | Where-Object { $_.DriveLetter } | Select-Object DriveLetter,FileSystem,Size,SizeRemaining | ConvertTo-Json -Compress",
             ],
         );
-        let mut evidence = Vec::new();
-        evidence.push(evidence_from_command(
+        let evidence = vec![evidence_from_command(
             EvidenceKind::Command,
             "powershell Get-Volume | ConvertTo-Json",
             &out,
-        ));
+        )];
 
         let (facts, volatile) = if out.ran && out.exit_code == Some(0) {
             parse_volumes(&out.stdout)
@@ -53,20 +52,14 @@ impl Detector for HostDisk {
             .unwrap_or(0);
 
         let (status, summary) = if volume_count > 0 {
-            (
-                DetectStatus::Ok,
-                format!("{} 个卷", volume_count),
-            )
+            (DetectStatus::Ok, format!("{volume_count} 个卷"))
         } else if out.ran {
             (
                 DetectStatus::Degraded,
                 "Get-Volume 无输出或解析失败".to_string(),
             )
         } else {
-            (
-                DetectStatus::Error,
-                "PowerShell 不可用".to_string(),
-            )
+            (DetectStatus::Error, "PowerShell 不可用".to_string())
         };
 
         DetectorResult {
@@ -82,9 +75,7 @@ impl Detector for HostDisk {
 /// 解析 Get-Volume JSON —— 与 IO 分离，独立可测。
 /// facts: volumes = Set of Map { drive, filesystem, total_bytes }
 /// volatile: free_bytes = Map { drive -> Int }
-pub fn parse_volumes(
-    json: &str,
-) -> (BTreeMap<String, FactValue>, BTreeMap<String, FactValue>) {
+pub fn parse_volumes(json: &str) -> (BTreeMap<String, FactValue>, BTreeMap<String, FactValue>) {
     let mut facts = BTreeMap::new();
     let mut volatile = BTreeMap::new();
 
@@ -113,10 +104,7 @@ pub fn parse_volumes(
             .and_then(|f| f.as_str())
             .filter(|f| !f.is_empty())
             .map(|f| f.to_string());
-        let total = item
-            .get("Size")
-            .and_then(|s| s.as_u64())
-            .map(|s| s as i64);
+        let total = item.get("Size").and_then(|s| s.as_u64()).map(|s| s as i64);
         let free = item
             .get("SizeRemaining")
             .and_then(|s| s.as_u64())
@@ -170,18 +158,12 @@ mod tests {
         // 第一个卷
         match volumes.first().unwrap() {
             FactValue::Map(m) => {
-                assert_eq!(
-                    m.get("drive").unwrap(),
-                    &FactValue::Str("C:".to_string())
-                );
+                assert_eq!(m.get("drive").unwrap(), &FactValue::Str("C:".to_string()));
                 assert_eq!(
                     m.get("filesystem").unwrap(),
                     &FactValue::Str("NTFS".to_string())
                 );
-                assert_eq!(
-                    m.get("total_bytes").unwrap(),
-                    &FactValue::Int(511659282432)
-                );
+                assert_eq!(m.get("total_bytes").unwrap(), &FactValue::Int(511659282432));
                 // free_bytes 绝不在 facts 里
                 assert!(!m.contains_key("free_bytes"));
             }
@@ -193,10 +175,7 @@ mod tests {
             FactValue::Map(m) => m,
             _ => panic!("free_bytes should be Map"),
         };
-        assert_eq!(
-            free.get("C:").unwrap(),
-            &FactValue::Int(30853988352)
-        );
+        assert_eq!(free.get("C:").unwrap(), &FactValue::Int(30853988352));
     }
 
     #[test]
@@ -209,7 +188,7 @@ mod tests {
             _ => panic!("volumes should be Set"),
         };
         assert_eq!(volumes.len(), 1);
-        assert_eq!(volatile.get("free_bytes").is_some(), true);
+        assert!(volatile.contains_key("free_bytes"));
     }
 
     #[test]

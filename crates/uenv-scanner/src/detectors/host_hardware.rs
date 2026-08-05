@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 
 use uenv_core::{Cost, DetectStatus, EvidenceKind, FactValue, Layer};
 
-use crate::context::{evidence_from_command, ScanContext};
+use crate::context::{ScanContext, evidence_from_command};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct HostHardware;
@@ -33,12 +33,7 @@ impl Detector for HostHardware {
                 "$cpu=Get-CimInstance Win32_Processor | Select-Object -First 1; $cs=Get-CimInstance Win32_ComputerSystem; [PSCustomObject]@{cpu_name=$cpu.Name; cores=$cpu.NumberOfCores; ram=$cs.TotalPhysicalMemory; manufacturer=$cs.Manufacturer; model=$cs.Model} | ConvertTo-Json -Compress",
             ],
         );
-        let mut evidence = Vec::new();
-        evidence.push(evidence_from_command(
-            EvidenceKind::Command,
-            ps_cmd,
-            &out,
-        ));
+        let evidence = vec![evidence_from_command(EvidenceKind::Command, ps_cmd, &out)];
 
         let mut facts = BTreeMap::new();
         let summary: String;

@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 
 use uenv_core::{Cost, DetectStatus, EvidenceKind, FactValue, Layer};
 
-use crate::context::{evidence_from_command, ScanContext};
+use crate::context::{ScanContext, evidence_from_command};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct SecurityDefender;
@@ -159,10 +159,7 @@ pub fn parse_defender(
 
     // 排除路径集合（进 facts，Set）
     if !paths.is_empty() {
-        let set: Vec<FactValue> = paths
-            .iter()
-            .map(|p| FactValue::Path(p.clone()))
-            .collect();
+        let set: Vec<FactValue> = paths.iter().map(|p| FactValue::Path(p.clone())).collect();
         facts.insert("exclusion_paths".to_string(), FactValue::Set(set));
     }
 
