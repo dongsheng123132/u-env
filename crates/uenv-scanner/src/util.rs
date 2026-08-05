@@ -26,7 +26,17 @@ fn decode_bytes(bytes: &[u8]) -> String {
     }
 
     // 2. 尝试 UTF-8 严格解码
+    // ⚠️ 含 NUL 的字节流（如纯 ASCII 的 UTF-16LE：" \x00 \x00N\x00A\x00"）也是
+    //    合法 UTF-8，from_utf8 会直接成功 → 永远走不到 UTF-16 启发分支。
+    //    先检查 NUL：有 NUL 就先做 UTF-16 判定，再决定用哪个解码器。
     if let Ok(s) = std::str::from_utf8(bytes) {
+        if bytes.contains(&0) {
+            // 可能是 UTF-16LE（ASCII 字符高位为 0）——wsl -l -v 表头/发行版名
+            // 全是 ASCII，中文系统上一样输出纯 ASCII 的 UTF-16LE
+            if is_likely_utf16le(bytes) {
+                return decode_utf16le(bytes);
+            }
+        }
         return s.to_string();
     }
 
@@ -221,5 +231,18 @@ mod tests {
         }
         let result = decode_bytes(&bytes);
         assert_eq!(result, "默认版本: 2\r\n");
+    }
+
+    /// wsl --list --verbose 表头是纯 ASCII 的 UTF-16LE（含 NUL）。
+    /// 这种字节流恰好是合法 UTF-8（NUL 是合法码点），不能走 from_utf8 分支。
+    #[test]
+    fn decode_ascii_utf16le_no_bom() {
+        // "* Ubuntu    Stopped         2\r\n" 的 UTF-16LE 编码（无 BOM）
+        let mut bytes = Vec::new();
+        for ch in "* Ubuntu    Stopped         2\r\n".encode_utf16() {
+            bytes.extend_from_slice(&ch.to_le_bytes());
+        }
+        let result = decode_bytes(&bytes);
+        assert_eq!(result, "* Ubuntu    Stopped         2\r\n");
     }
 }
