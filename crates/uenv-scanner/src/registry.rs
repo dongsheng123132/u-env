@@ -14,5 +14,8 @@ pub fn all_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(detectors::wsl_status::WslStatus),
         Box::new(detectors::fs_project_location::FsProjectLocation),
         Box::new(detectors::security_defender::SecurityDefender),
+        Box::new(detectors::net_proxy::NetProxy),
+        Box::new(detectors::host_disk::HostDisk),
+        Box::new(detectors::host_hardware::HostHardware),
     ]
 }
