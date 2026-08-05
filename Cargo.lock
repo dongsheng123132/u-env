@@ -471,6 +471,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20"
 
 [[package]]
+name = "uenv-adapters"
+version = "0.0.1"
+dependencies = [
+ "uenv-core",
+]
+
+[[package]]
 name = "uenv-cli"
 version = "0.0.1"
 dependencies = [
@@ -532,6 +539,7 @@ dependencies = [
  "encoding_rs",
  "serde",
  "serde_json",
+ "sha2",
  "uenv-core",
  "winreg",
 ]
