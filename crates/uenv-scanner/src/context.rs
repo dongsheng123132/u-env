@@ -68,24 +68,23 @@ impl ScanContext {
     ) -> CommandOutcome {
         let start = Instant::now();
 
-        let mut child = match Command::new(program)
-            .args(args)
-            .stdin(Stdio::null())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()
-        {
+        // 直接 spawn；失败（Windows 上 .cmd/.bat 脚本 CreateProcess 不认）时
+        // fallback 到 cmd /c —— npm/pnpm/yarn/corepack 都是 .cmd 脚本。
+        let mut child = match spawn_direct(program, args) {
             Ok(c) => c,
-            Err(e) => {
-                return CommandOutcome {
-                    ran: false,
-                    exit_code: None,
-                    stdout: String::new(),
-                    stderr: format!("failed to spawn {program}: {e}"),
-                    timed_out: false,
-                    elapsed_ms: start.elapsed().as_millis() as u64,
-                };
-            }
+            Err(first_err) => match spawn_via_cmd(program, args) {
+                Ok(c) => c,
+                Err(_) => {
+                    return CommandOutcome {
+                        ran: false,
+                        exit_code: None,
+                        stdout: String::new(),
+                        stderr: format!("failed to spawn {program}: {first_err}"),
+                        timed_out: false,
+                        elapsed_ms: start.elapsed().as_millis() as u64,
+                    };
+                }
+            },
         };
 
         // 轮询等待完成或超时（std 没有 wait_timeout，用 try_wait + sleep）
@@ -260,6 +259,38 @@ fn decode_reg_sz(bytes: &[u8]) -> String {
     let s = String::from_utf16_lossy(&u16s);
     // 去除尾部 NUL
     s.trim_end_matches('\0').to_string()
+}
+
+/// 直接 spawn 子进程（stdin/stdout/stderr 全接管）
+fn spawn_direct(program: &str, args: &[&str]) -> std::io::Result<std::process::Child> {
+    Command::new(program)
+        .args(args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+}
+
+/// 通过 cmd /c 运行：Windows 上 .cmd/.bat 脚本（npm/pnpm/yarn/corepack）
+/// CreateProcess 不认，必须交给 cmd.exe。仅作为 spawn 失败的兜底。
+fn spawn_via_cmd(program: &str, args: &[&str]) -> std::io::Result<std::process::Child> {
+    let mut cmdline = program.to_string();
+    for a in args {
+        cmdline.push(' ');
+        if a.contains(' ') || a.contains('&') || a.contains('|') || a.contains('<') || a.contains('>') {
+            cmdline.push('"');
+            cmdline.push_str(a);
+            cmdline.push('"');
+        } else {
+            cmdline.push_str(a);
+        }
+    }
+    Command::new("cmd")
+        .args(["/c", &cmdline])
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
 }
 
 /// 从 CommandOutcome 构建 Evidence
