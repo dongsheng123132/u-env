@@ -127,6 +127,7 @@ fn run_scan(cli: &Cli, out: &Output, out_path: Option<&std::path::PathBuf>) {
             os: OperatingSystem {
                 family: "windows".to_string(),
                 product_name: "Unknown".to_string(),
+                product_name_raw: "Unknown".to_string(),
                 version: "0.0.0".to_string(),
                 build: 0,
                 ubr: None,

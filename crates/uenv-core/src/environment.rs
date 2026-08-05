@@ -29,6 +29,8 @@ pub struct EnvironmentIdentity {
 pub struct OperatingSystem {
     pub family: String,
     pub product_name: String,
+    /// 注册表原值，可能是错的（如 Win11 写成 Windows 10）
+    pub product_name_raw: String,
     pub version: String,
     pub build: u32,
     pub ubr: Option<u32>,
