@@ -30,5 +30,6 @@ pub fn all_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(detectors::project_manifests::ProjectManifests),
         Box::new(detectors::project_lockfiles::ProjectLockfiles),
         Box::new(detectors::project_git::ProjectGit),
+        Box::new(detectors::project_drift::ProjectDrift),
     ]
 }

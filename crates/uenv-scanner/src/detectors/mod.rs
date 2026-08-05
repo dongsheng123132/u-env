@@ -3,6 +3,7 @@ pub mod host_disk;
 pub mod host_hardware;
 pub mod net_proxy;
 pub mod path_analysis;
+pub mod project_drift;
 pub mod project_git;
 pub mod project_kind;
 pub mod project_lockfiles;
