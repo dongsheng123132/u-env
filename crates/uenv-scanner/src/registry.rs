@@ -10,5 +10,7 @@ pub fn all_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(detectors::windows_powershell::WindowsPowerShell),
         Box::new(detectors::windows_developer_mode::WindowsDeveloperMode),
         Box::new(detectors::windows_long_paths::WindowsLongPaths),
+        Box::new(detectors::windows_locale::WindowsLocale),
+        Box::new(detectors::wsl_status::WslStatus),
     ]
 }
