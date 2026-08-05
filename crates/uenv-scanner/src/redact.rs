@@ -141,7 +141,7 @@ fn redact_proxy_auth(s: &str) -> String {
                         continue;
                     }
                 }
-                new_result.push_str(&result[pos..abs_idx + scheme.len()]);
+                // 无认证信息：scheme 已在上面 push 过，只前进不重复
                 pos = abs_idx + scheme.len();
             } else {
                 new_result.push_str(&result[pos..]);
@@ -186,6 +186,26 @@ mod tests {
     #[test]
     fn no_panic_on_empty() {
         assert_eq!(redact(""), "");
+    }
+
+    /// 无认证的 http(s) URL 不能重复 scheme（回归：redact_proxy_auth 曾把
+    /// "http://127.0.0.1:7897" 变成 "http://http://127.0.0.1:7897"）
+    #[test]
+    fn proxy_url_no_dup_scheme() {
+        let input = "HTTP_PROXY=http://127.0.0.1:7897";
+        let out = redact(input);
+        assert_eq!(out, "HTTP_PROXY=http://127.0.0.1:7897");
+        // 不能出现重复 scheme
+        assert!(!out.contains("http://http://"));
+    }
+
+    /// 带账号密码的代理 URL 必须脱敏
+    #[test]
+    fn proxy_url_with_auth_redacted() {
+        let input = "http://user:pass123@127.0.0.1:7897";
+        let out = redact(input);
+        assert!(out.contains("<redacted>@"), "got: {out}");
+        assert!(!out.contains("pass123"), "got: {out}");
     }
 
     /// which_all 脱敏后必须保持可比性：同一路径每次都产出同样的结果
