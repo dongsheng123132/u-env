@@ -1,0 +1,13 @@
+[package]
+name = "uenv-rules"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "u-env rules engine: Rule trait, evaluate Environment → Vec<Finding>."
+
+[dependencies]
+serde.workspace = true
+uenv-core = { path = "../uenv-core" }
+

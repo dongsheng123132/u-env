@@ -1,0 +1,18 @@
+[package]
+name = "uenv-scanner"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "u-env scanner: Detector trait, ScanContext (run/reg_read/which_all/redact), all detectors."
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+winreg.workspace = true
+encoding_rs.workspace = true
+chrono.workspace = true
+uenv-core = { path = "../uenv-core" }
+

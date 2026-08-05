@@ -1,0 +1,16 @@
+[package]
+name = "uenv-fingerprint"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "u-env fingerprint: canonical JSON normalization, SHA-256 hash, diff."
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+anyhow.workspace = true
+uenv-core = { path = "../uenv-core" }
+

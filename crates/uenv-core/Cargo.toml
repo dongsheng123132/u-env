@@ -1,0 +1,13 @@
+[package]
+name = "uenv-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "u-env data model: Environment, DetectorRecord, FactValue, Finding, fingerprint types. Zero Windows deps."
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+

@@ -1,0 +1,25 @@
+[package]
+name = "uenv-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "u-env CLI: clap entry point, output layer, binary name `uenv`."
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+chrono.workspace = true
+uenv-core = { path = "../uenv-core" }
+uenv-scanner = { path = "../uenv-scanner" }
+uenv-rules = { path = "../uenv-rules" }
+uenv-fingerprint = { path = "../uenv-fingerprint" }
+uenv-report = { path = "../uenv-report" }
+
+
+[[bin]]
+name = "uenv"
+path = "src/main.rs"
