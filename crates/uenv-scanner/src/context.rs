@@ -60,12 +60,7 @@ impl ScanContext {
         self.run_with_timeout(program, args, Duration::from_secs(20))
     }
 
-    fn run_with_timeout(
-        &self,
-        program: &str,
-        args: &[&str],
-        timeout: Duration,
-    ) -> CommandOutcome {
+    fn run_with_timeout(&self, program: &str, args: &[&str], timeout: Duration) -> CommandOutcome {
         let start = Instant::now();
 
         // 直接 spawn；失败（Windows 上 .cmd/.bat 脚本 CreateProcess 不认）时
@@ -277,7 +272,12 @@ fn spawn_via_cmd(program: &str, args: &[&str]) -> std::io::Result<std::process::
     let mut cmdline = program.to_string();
     for a in args {
         cmdline.push(' ');
-        if a.contains(' ') || a.contains('&') || a.contains('|') || a.contains('<') || a.contains('>') {
+        if a.contains(' ')
+            || a.contains('&')
+            || a.contains('|')
+            || a.contains('<')
+            || a.contains('>')
+        {
             cmdline.push('"');
             cmdline.push_str(a);
             cmdline.push('"');

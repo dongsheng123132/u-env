@@ -36,23 +36,28 @@ impl Detector for PathAnalysis {
         } else {
             path_raw.clone()
         };
-        let mut evidence = Vec::new();
-        evidence.push(Evidence {
+        let evidence = vec![Evidence {
             kind: EvidenceKind::Env,
             source: "PATH".to_string(),
             exit_code: None,
             excerpt: path_redacted.clone(),
-        });
+        }];
 
         // PATH 原文进 volatile（规格 §5.4：原文随终端而变，不进指纹）
         let mut volatile = BTreeMap::new();
         volatile.insert("path_raw".to_string(), FactValue::Str(path_redacted));
 
         let mut facts = BTreeMap::new();
-        let entries: Vec<&str> = path_raw.split(';').filter(|e| !e.trim().is_empty()).collect();
+        let entries: Vec<&str> = path_raw
+            .split(';')
+            .filter(|e| !e.trim().is_empty())
+            .collect();
 
         // 条目总数
-        facts.insert("entry_count".to_string(), FactValue::Int(entries.len() as i64));
+        facts.insert(
+            "entry_count".to_string(),
+            FactValue::Int(entries.len() as i64),
+        );
 
         // 重复条目（规范化比较：trim + 去尾部 \，大小写不敏感）
         let mut seen: std::collections::BTreeMap<String, i32> = BTreeMap::new();
@@ -129,8 +134,14 @@ fn normalize_entry(e: &str) -> String {
 /// missing（依赖文件系统）与 shadowed_exes（依赖 which 探测）在 detect() 里算。
 pub fn parse_path_analysis(path_raw: &str) -> BTreeMap<String, FactValue> {
     let mut facts = BTreeMap::new();
-    let entries: Vec<&str> = path_raw.split(';').filter(|e| !e.trim().is_empty()).collect();
-    facts.insert("entry_count".to_string(), FactValue::Int(entries.len() as i64));
+    let entries: Vec<&str> = path_raw
+        .split(';')
+        .filter(|e| !e.trim().is_empty())
+        .collect();
+    facts.insert(
+        "entry_count".to_string(),
+        FactValue::Int(entries.len() as i64),
+    );
 
     // 重复
     let mut seen: BTreeMap<String, i32> = BTreeMap::new();

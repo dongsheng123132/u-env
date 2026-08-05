@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 use uenv_core::{Cost, DetectStatus, FactValue, Layer};
 use winreg::enums::HKEY_LOCAL_MACHINE;
 
-use crate::context::{evidence_from_registry, ScanContext};
+use crate::context::{ScanContext, evidence_from_registry};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct ToolchainWindowsSdk;
@@ -28,8 +28,7 @@ impl Detector for ToolchainWindowsSdk {
         let name = "InstallationFolder";
 
         let value = ctx.reg_read(HKEY_LOCAL_MACHINE, path, name);
-        let mut evidence = Vec::new();
-        evidence.push(evidence_from_registry(path, name, &value));
+        let evidence = vec![evidence_from_registry(path, name, &value)];
 
         let mut facts = BTreeMap::new();
         let mut sdk_root = String::new();
@@ -98,7 +97,9 @@ pub fn parse_windows_sdk(
     include_subdirs: &[&str],
 ) -> BTreeMap<String, FactValue> {
     let mut facts = BTreeMap::new();
-    let root = installation_folder.unwrap_or("").trim_end_matches(['\\', '/']);
+    let root = installation_folder
+        .unwrap_or("")
+        .trim_end_matches(['\\', '/']);
     if !root.is_empty() {
         facts.insert("sdk_root".to_string(), FactValue::Path(root.to_string()));
         let versions: Vec<FactValue> = include_subdirs

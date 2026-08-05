@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 use uenv_core::{Cost, DetectStatus, FactValue, Layer};
 use winreg::enums::{HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE};
 
-use crate::context::{evidence_from_registry, ScanContext};
+use crate::context::{ScanContext, evidence_from_registry};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 const WEBVIEW2_CLIENT: &str =
@@ -35,12 +35,20 @@ impl Detector for RuntimeWebView2 {
         let hklm_pv = ctx.reg_read(HKEY_LOCAL_MACHINE, WEBVIEW2_CLIENT, "pv");
         evidence.push(evidence_from_registry(WEBVIEW2_CLIENT, "pv", &hklm_pv));
         let hklm_channel = ctx.reg_read(HKEY_LOCAL_MACHINE, WEBVIEW2_CLIENT, "channel");
-        evidence.push(evidence_from_registry(WEBVIEW2_CLIENT, "channel", &hklm_channel));
+        evidence.push(evidence_from_registry(
+            WEBVIEW2_CLIENT,
+            "channel",
+            &hklm_channel,
+        ));
 
         let hkcu_pv = ctx.reg_read(HKEY_CURRENT_USER, WEBVIEW2_CLIENT_HKCU, "pv");
         evidence.push(evidence_from_registry(WEBVIEW2_CLIENT_HKCU, "pv", &hkcu_pv));
         let hkcu_channel = ctx.reg_read(HKEY_CURRENT_USER, WEBVIEW2_CLIENT_HKCU, "channel");
-        evidence.push(evidence_from_registry(WEBVIEW2_CLIENT_HKCU, "channel", &hkcu_channel));
+        evidence.push(evidence_from_registry(
+            WEBVIEW2_CLIENT_HKCU,
+            "channel",
+            &hkcu_channel,
+        ));
 
         // 优先机器级，其次用户级
         let pv = hklm_pv.as_ref().or(hkcu_pv.as_ref());
@@ -78,10 +86,7 @@ impl Detector for RuntimeWebView2 {
                 ),
             )
         } else {
-            (
-                DetectStatus::Absent,
-                "WebView2 Runtime 未安装".to_string(),
-            )
+            (DetectStatus::Absent, "WebView2 Runtime 未安装".to_string())
         };
 
         DetectorResult {
@@ -95,10 +100,7 @@ impl Detector for RuntimeWebView2 {
 }
 
 /// 解析逻辑与 IO 分离 —— 独立可测
-pub fn parse_webview2(
-    pv: Option<&str>,
-    channel: Option<&str>,
-) -> BTreeMap<String, FactValue> {
+pub fn parse_webview2(pv: Option<&str>, channel: Option<&str>) -> BTreeMap<String, FactValue> {
     let mut facts = BTreeMap::new();
     let installed = pv.is_some();
     facts.insert("installed".to_string(), FactValue::Bool(installed));

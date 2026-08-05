@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 
 use uenv_core::{Cost, DetectStatus, EvidenceKind, FactValue, Layer};
 
-use crate::context::{evidence_from_command, ScanContext};
+use crate::context::{ScanContext, evidence_from_command};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 const VSWHERE: &str = r"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe";
@@ -91,22 +91,20 @@ impl Detector for ToolchainMsvc {
             .unwrap_or(0);
 
         let (status, summary) = if instance_count == 0 && degraded {
-            (
-                DetectStatus::Degraded,
-                "vswhere 输出无法解析".to_string(),
-            )
+            (DetectStatus::Degraded, "vswhere 输出无法解析".to_string())
         } else if instance_count == 0 {
-            (
-                DetectStatus::Ok,
-                "vswhere 可用但无实例".to_string(),
-            )
+            (DetectStatus::Ok, "vswhere 可用但无实例".to_string())
         } else {
             (
                 DetectStatus::Ok,
                 format!(
                     "{} 个实例{}",
                     instance_count,
-                    if has_cpp { "（含 C++ workload）" } else { "" }
+                    if has_cpp {
+                        "（含 C++ workload）"
+                    } else {
+                        ""
+                    }
                 ),
             )
         };
@@ -145,7 +143,10 @@ pub fn parse_vswhere(json: &str) -> (Vec<BTreeMap<String, FactValue>>, bool) {
             m.insert("version".to_string(), FactValue::Version(ver.to_string()));
         }
         if let Some(path) = inst.get("installationPath").and_then(|p| p.as_str()) {
-            m.insert("install_path".to_string(), FactValue::Path(path.to_string()));
+            m.insert(
+                "install_path".to_string(),
+                FactValue::Path(path.to_string()),
+            );
         }
         instances.push(m);
     }

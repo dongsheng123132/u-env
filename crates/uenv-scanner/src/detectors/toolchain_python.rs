@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 
 use uenv_core::{Cost, DetectStatus, EvidenceKind, FactValue, Layer};
 
-use crate::context::{evidence_from_command, ScanContext};
+use crate::context::{ScanContext, evidence_from_command};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct ToolchainPython;
@@ -73,7 +73,10 @@ impl Detector for ToolchainPython {
             };
             (
                 DetectStatus::Ok,
-                if matches!(final_facts.get("store_alias_shadow"), Some(FactValue::Bool(true))) {
+                if matches!(
+                    final_facts.get("store_alias_shadow"),
+                    Some(FactValue::Bool(true))
+                ) {
                     format!("Python {v}（注意：PATH 含 Store 别名）")
                 } else {
                     format!("Python {v}")
@@ -127,7 +130,10 @@ pub fn parse_python(
         let v = py_ver_stdout.trim();
         if let Some(ver) = v.strip_prefix("Python ") {
             if !ver.is_empty() {
-                facts.insert("python_version".to_string(), FactValue::Version(ver.to_string()));
+                facts.insert(
+                    "python_version".to_string(),
+                    FactValue::Version(ver.to_string()),
+                );
             }
         }
     }
@@ -135,11 +141,17 @@ pub fn parse_python(
         let v = launcher_stdout.trim();
         if let Some(ver) = v.strip_prefix("Python ") {
             if !ver.is_empty() {
-                facts.insert("py_launcher_version".to_string(), FactValue::Version(ver.to_string()));
+                facts.insert(
+                    "py_launcher_version".to_string(),
+                    FactValue::Version(ver.to_string()),
+                );
             }
         }
     }
-    facts.insert("store_alias_shadow".to_string(), FactValue::Bool(store_alias));
+    facts.insert(
+        "store_alias_shadow".to_string(),
+        FactValue::Bool(store_alias),
+    );
 
     facts
 }

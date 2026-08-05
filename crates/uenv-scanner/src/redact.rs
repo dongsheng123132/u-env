@@ -34,12 +34,12 @@ pub fn redact(s: &str) -> String {
     for user in &user_candidates {
         let pattern = format!("\\Users\\{user}");
         let replacement = "\\Users\\<user>";
-        result = replace_case_insensitive(&result, &pattern, &replacement);
+        result = replace_case_insensitive(&result, &pattern, replacement);
 
         // 1b. 正斜杠版本：git 等工具输出 C:/Users/XXX（Windows 上分隔符不统一）
         let pattern_fwd = format!("/Users/{user}");
         let replacement_fwd = "/Users/<user>";
-        result = replace_case_insensitive(&result, &pattern_fwd, &replacement_fwd);
+        result = replace_case_insensitive(&result, &pattern_fwd, replacement_fwd);
     }
 
     // 2. HOME / USERPROFILE 路径（反斜杠 + 正斜杠两个形态）
@@ -159,8 +159,7 @@ fn redact_emails(s: &str) -> String {
             let mut j = i + 1;
             let mut has_dot = false;
             let mut has_letter = false;
-            while j < n
-                && (chars[j].is_ascii_alphanumeric() || chars[j] == '.' || chars[j] == '-')
+            while j < n && (chars[j].is_ascii_alphanumeric() || chars[j] == '.' || chars[j] == '-')
             {
                 if chars[j] == '.' {
                     has_dot = true;
@@ -174,7 +173,11 @@ fn redact_emails(s: &str) -> String {
             let mut k = i;
             while k > 0 {
                 let prev = chars[k - 1];
-                if prev.is_ascii_alphanumeric() || prev == '.' || prev == '%' || prev == '+' || prev == '-'
+                if prev.is_ascii_alphanumeric()
+                    || prev == '.'
+                    || prev == '%'
+                    || prev == '+'
+                    || prev == '-'
                 {
                     k -= 1;
                 } else {

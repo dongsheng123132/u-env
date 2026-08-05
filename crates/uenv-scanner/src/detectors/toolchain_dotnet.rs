@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 
 use uenv_core::{Cost, DetectStatus, EvidenceKind, FactValue, Layer};
 
-use crate::context::{evidence_from_command, ScanContext};
+use crate::context::{ScanContext, evidence_from_command};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct ToolchainDotnet;
@@ -61,10 +61,7 @@ impl Detector for ToolchainDotnet {
             .unwrap_or(0);
 
         let (status, summary) = if sdk_count > 0 {
-            (
-                DetectStatus::Ok,
-                format!("{sdk_count} 个 SDK"),
-            )
+            (DetectStatus::Ok, format!("{sdk_count} 个 SDK"))
         } else {
             (
                 DetectStatus::Error,
@@ -126,7 +123,10 @@ pub fn parse_dotnet(sdks_out: &str, runtimes_out: &str) -> BTreeMap<String, Fact
         }
     }
     if !runtime_versions.is_empty() {
-        facts.insert("runtime_versions".to_string(), FactValue::Set(runtime_versions));
+        facts.insert(
+            "runtime_versions".to_string(),
+            FactValue::Set(runtime_versions),
+        );
     }
     if !windows_desktop.is_empty() {
         facts.insert(

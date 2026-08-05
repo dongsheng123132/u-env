@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 
 use uenv_core::{Cost, DetectStatus, EvidenceKind, FactValue, Layer};
 
-use crate::context::{evidence_from_command, ScanContext};
+use crate::context::{ScanContext, evidence_from_command};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct ToolchainGit;
@@ -63,10 +63,7 @@ impl Detector for ToolchainGit {
                 "git --version 输出无法解析".to_string(),
             )
         } else {
-            (
-                DetectStatus::Ok,
-                format!("Git {version}"),
-            )
+            (DetectStatus::Ok, format!("Git {version}"))
         };
 
         DetectorResult {
@@ -93,7 +90,10 @@ fn parse_git_version(out: &str) -> String {
 /// 行格式：`file:C:/path\tkey=value`（git 用 tab 分隔 origin 与 key=value）。
 pub fn parse_git_config(out: &str, version: &str) -> BTreeMap<String, FactValue> {
     let mut facts = BTreeMap::new();
-    facts.insert("version".to_string(), FactValue::Version(version.to_string()));
+    facts.insert(
+        "version".to_string(),
+        FactValue::Version(version.to_string()),
+    );
 
     let mut autocrlf: Option<String> = None;
     let mut longpaths: Option<String> = None;
@@ -186,9 +186,7 @@ mod tests {
         );
         assert_eq!(
             facts.get("safe_directories").unwrap(),
-            &FactValue::Set(vec![FactValue::Path(
-                "C:/Users/<user>/proj".to_string()
-            )])
+            &FactValue::Set(vec![FactValue::Path("C:/Users/<user>/proj".to_string())])
         );
         // longpaths 未配置 → 无键
         assert!(!facts.contains_key("longpaths"));

@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 
 use uenv_core::{Cost, DetectStatus, EvidenceKind, FactValue, Layer};
 
-use crate::context::{evidence_from_command, ScanContext};
+use crate::context::{ScanContext, evidence_from_command};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct ToolchainRust;
@@ -61,10 +61,7 @@ impl Detector for ToolchainRust {
         }
 
         let (status, summary) = if facts.is_empty() {
-            (
-                DetectStatus::Error,
-                "rustup show 输出无法解析".to_string(),
-            )
+            (DetectStatus::Error, "rustup show 输出无法解析".to_string())
         } else {
             let active = facts
                 .get("active_toolchain")
@@ -136,12 +133,13 @@ pub fn parse_rustup(show_out: &str, targets_out: &str) -> BTreeMap<String, FactV
                 toolchains.push(FactValue::Str(name));
             }
         } else if in_active {
-            if line.starts_with("name:") {
-                let v = line["name:".len()..].trim().to_string();
+            if let Some(rest) = line.strip_prefix("name:") {
+                let v = rest.trim().to_string();
                 if !v.is_empty() {
                     facts.insert("active_toolchain".to_string(), FactValue::Str(v));
                 }
-            } else if line.starts_with("installed targets") || line.starts_with("Installed targets") {
+            } else if line.starts_with("installed targets") || line.starts_with("Installed targets")
+            {
                 // targets 在下一行（缩进），rustup target list 已有全量，这里跳过
             }
         }

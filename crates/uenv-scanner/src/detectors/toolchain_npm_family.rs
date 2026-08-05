@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 
 use uenv_core::{Cost, DetectStatus, EvidenceKind, FactValue, Layer};
 
-use crate::context::{evidence_from_command, ScanContext};
+use crate::context::{ScanContext, evidence_from_command};
 use crate::detector::{Detector, DetectorMeta, DetectorResult};
 
 pub struct ToolchainNpmFamily;
@@ -89,10 +89,7 @@ impl Detector for ToolchainNpmFamily {
         );
 
         let (status, summary) = if facts.is_empty() {
-            (
-                DetectStatus::Absent,
-                "npm 家族工具未安装".to_string(),
-            )
+            (DetectStatus::Absent, "npm 家族工具未安装".to_string())
         } else {
             let npm_v = facts
                 .get("npm_version")
@@ -163,13 +160,19 @@ pub fn parse_npm_family(
     if pnpm_ran {
         let v = pnpm_ver.trim();
         if !v.is_empty() {
-            facts.insert("pnpm_version".to_string(), FactValue::Version(v.to_string()));
+            facts.insert(
+                "pnpm_version".to_string(),
+                FactValue::Version(v.to_string()),
+            );
         }
     }
     if yarn_ran {
         let v = yarn_ver.trim();
         if !v.is_empty() {
-            facts.insert("yarn_version".to_string(), FactValue::Version(v.to_string()));
+            facts.insert(
+                "yarn_version".to_string(),
+                FactValue::Version(v.to_string()),
+            );
         }
     }
     if bun_ran {
@@ -198,13 +201,20 @@ mod tests {
     #[test]
     fn parse_full_install() {
         let facts = parse_npm_family(
-            "10.9.2", true,
-            r"C:\Users\me\AppData\Roaming\npm", true,
-            "https://registry.npmmirror.com", true,
-            "10.33.0", true,
-            "1.22.21", true,
-            "", false, // bun 未装
-            "0.31.0", true,
+            "10.9.2",
+            true,
+            r"C:\Users\me\AppData\Roaming\npm",
+            true,
+            "https://registry.npmmirror.com",
+            true,
+            "10.33.0",
+            true,
+            "1.22.21",
+            true,
+            "",
+            false, // bun 未装
+            "0.31.0",
+            true,
         );
         assert_eq!(
             facts.get("npm_version").unwrap(),
@@ -233,10 +243,7 @@ mod tests {
     fn parse_npm_null_config() {
         // npm config get prefix 输出 null（未设置）→ 不进 facts
         let facts = parse_npm_family(
-            "10.9.2", true,
-            "null", true,
-            "null", true,
-            "", false, "", false, "", false, "", false,
+            "10.9.2", true, "null", true, "null", true, "", false, "", false, "", false, "", false,
         );
         assert!(!facts.contains_key("npm_prefix"));
         assert!(!facts.contains_key("npm_registry"));
@@ -253,7 +260,9 @@ mod tests {
 
     #[test]
     fn parse_not_installed() {
-        let facts = parse_npm_family("", false, "", false, "", false, "", false, "", false, "", false, "", false);
+        let facts = parse_npm_family(
+            "", false, "", false, "", false, "", false, "", false, "", false, "", false,
+        );
         assert!(facts.is_empty());
     }
 }
