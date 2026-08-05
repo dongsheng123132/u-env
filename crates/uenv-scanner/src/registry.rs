@@ -7,5 +7,8 @@ pub fn all_detectors() -> Vec<Box<dyn Detector>> {
     vec![
         Box::new(detectors::windows_version::WindowsVersion),
         Box::new(detectors::toolchain_node::ToolchainNode),
+        Box::new(detectors::windows_powershell::WindowsPowerShell),
+        Box::new(detectors::windows_developer_mode::WindowsDeveloperMode),
+        Box::new(detectors::windows_long_paths::WindowsLongPaths),
     ]
 }
