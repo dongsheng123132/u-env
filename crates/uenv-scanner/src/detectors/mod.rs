@@ -3,6 +3,8 @@ pub mod host_disk;
 pub mod host_hardware;
 pub mod net_proxy;
 pub mod path_analysis;
+pub mod project_kind;
+pub mod project_manifests;
 pub mod runtime_webview2;
 pub mod security_defender;
 pub mod toolchain_dotnet;

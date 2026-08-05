@@ -26,5 +26,7 @@ pub fn all_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(detectors::toolchain_msvc::ToolchainMsvc),
         Box::new(detectors::toolchain_windows_sdk::ToolchainWindowsSdk),
         Box::new(detectors::runtime_webview2::RuntimeWebView2),
+        Box::new(detectors::project_kind::ProjectKind),
+        Box::new(detectors::project_manifests::ProjectManifests),
     ]
 }
