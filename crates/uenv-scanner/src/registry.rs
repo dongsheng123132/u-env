@@ -28,5 +28,7 @@ pub fn all_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(detectors::runtime_webview2::RuntimeWebView2),
         Box::new(detectors::project_kind::ProjectKind),
         Box::new(detectors::project_manifests::ProjectManifests),
+        Box::new(detectors::project_lockfiles::ProjectLockfiles),
+        Box::new(detectors::project_git::ProjectGit),
     ]
 }
