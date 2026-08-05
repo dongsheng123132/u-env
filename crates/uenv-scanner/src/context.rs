@@ -211,9 +211,19 @@ impl ScanContext {
         })
     }
 
-    /// PATH 里查同名可执行文件的全部命中（不是第一个）
+    /// PATH 里查同名可执行文件的**全部**命中（不是第一个）——冲突检测靠它。
+    /// 返回值已脱敏（用户目录 → `<user>`），可直接进 facts/evidence。
+    /// 注意：脱敏后的路径不能用于命令执行——如需执行，用 `ctx.run(exe_name, args)`。
     pub fn which_all(&self, exe: &str) -> Vec<PathBuf> {
-        find_all_in_path(exe)
+        let paths = find_all_in_path(exe);
+        if self.redact {
+            paths
+                .into_iter()
+                .map(|p| PathBuf::from(redact::redact(&p.to_string_lossy())))
+                .collect()
+        } else {
+            paths
+        }
     }
 
     /// 脱敏：用户名/机器名/密钥样式串 → 占位符

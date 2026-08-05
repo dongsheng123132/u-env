@@ -187,4 +187,22 @@ mod tests {
     fn no_panic_on_empty() {
         assert_eq!(redact(""), "");
     }
+
+    /// which_all 脱敏后必须保持可比性：同一路径每次都产出同样的结果
+    #[test]
+    fn which_all_redact_stable() {
+        // 模拟 which_all 返回的含用户名路径
+        let user = std::env::var("USERNAME").unwrap_or_else(|_| "testuser".to_string());
+        let input = format!("C:\\Users\\{user}\\Tools\\node\\node-v23.9.0-win-x64\\node.EXE");
+        let first = redact(&input);
+        let second = redact(&input);
+        // 两次脱敏结果必须一致
+        assert_eq!(first, second);
+        // 不能包含真实用户名
+        if !user.is_empty() && user != "testuser" {
+            assert!(!first.contains(&user));
+        }
+        // 必须包含占位符
+        assert!(first.contains("<user>"));
+    }
 }

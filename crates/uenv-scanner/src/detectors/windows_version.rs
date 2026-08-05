@@ -52,21 +52,34 @@ impl Detector for WindowsVersion {
         let current_minor = ctx.reg_read(HKEY_LOCAL_MACHINE, base, "CurrentMinorVersionNumber");
 
         // 构建 facts
-        let product_name_str = product_name
+        let product_name_raw = product_name
             .as_ref()
             .map(|v| v.value.clone())
             .unwrap_or_else(|| {
                 errors.push("ProductName not found in registry".to_string());
                 "Unknown".to_string()
             });
+        // product_name_raw: 注册表原值，不管对错都存
         facts.insert(
-            "product_name".to_string(),
-            FactValue::Str(product_name_str.clone()),
+            "product_name_raw".to_string(),
+            FactValue::Str(product_name_raw.clone()),
         );
 
         let major = parse_u32(&current_major).unwrap_or(10);
         let minor = parse_u32(&current_minor).unwrap_or(0);
         let build = parse_u32(&current_build).unwrap_or(0);
+
+        // ⚠️ Windows 11 判定：build >= 22000 → Windows 11
+        // 注册表 ProductName 在 Win11 上仍写 "Windows 10"，需推导修正
+        let product_name_str = if build >= 22000 {
+            product_name_raw.replace("Windows 10", "Windows 11")
+        } else {
+            product_name_raw.clone()
+        };
+        facts.insert(
+            "product_name".to_string(),
+            FactValue::Str(product_name_str.clone()),
+        );
 
         let version = format!("{major}.{minor}.{build}");
         facts.insert("version".to_string(), FactValue::Str(version));
@@ -160,10 +173,18 @@ pub fn parse_windows_version(
     let mut facts = BTreeMap::new();
     let major = 10;
     let minor = 0;
+    // product_name_raw: 注册表原值
     facts.insert(
-        "product_name".to_string(),
+        "product_name_raw".to_string(),
         FactValue::Str(product_name.to_string()),
     );
+    // Windows 11 判定：build >= 22000 → 替换 "Windows 10" 为 "Windows 11"
+    let derived_name = if build >= 22000 {
+        product_name.replace("Windows 10", "Windows 11")
+    } else {
+        product_name.to_string()
+    };
+    facts.insert("product_name".to_string(), FactValue::Str(derived_name));
     facts.insert(
         "version".to_string(),
         FactValue::Str(format!("{major}.{minor}.{build}")),
@@ -205,6 +226,10 @@ mod tests {
             &FactValue::Str("Windows 11 家庭中文版".to_string())
         );
         assert_eq!(
+            facts.get("product_name_raw").unwrap(),
+            &FactValue::Str("Windows 11 家庭中文版".to_string())
+        );
+        assert_eq!(
             facts.get("version").unwrap(),
             &FactValue::Str("10.0.26100".to_string())
         );
@@ -221,6 +246,41 @@ mod tests {
         assert_eq!(
             facts.get("architecture").unwrap(),
             &FactValue::Str("x64".to_string())
+        );
+    }
+
+    /// build 22631，注册表写着 "Windows 10 Home" → 推导为 "Windows 11 Home"
+    #[test]
+    fn win11_build_22631_from_registry_win10() {
+        let facts = parse_windows_version(
+            "Windows 10 Home", // 注册表原值（微软未更新）
+            22631,
+            None,
+            None,
+            None,
+            "x64",
+        );
+        assert_eq!(
+            facts.get("product_name").unwrap(),
+            &FactValue::Str("Windows 11 Home".to_string())
+        );
+        assert_eq!(
+            facts.get("product_name_raw").unwrap(),
+            &FactValue::Str("Windows 10 Home".to_string())
+        );
+    }
+
+    /// build 19045，注册表 "Windows 10 Home" → 沿用注册表值
+    #[test]
+    fn win10_build_19045_keeps_registry_name() {
+        let facts = parse_windows_version("Windows 10 Home", 19045, None, None, None, "x64");
+        assert_eq!(
+            facts.get("product_name").unwrap(),
+            &FactValue::Str("Windows 10 Home".to_string())
+        );
+        assert_eq!(
+            facts.get("product_name_raw").unwrap(),
+            &FactValue::Str("Windows 10 Home".to_string())
         );
     }
 

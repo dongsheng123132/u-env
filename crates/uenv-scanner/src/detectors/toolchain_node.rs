@@ -46,62 +46,57 @@ impl Detector for ToolchainNode {
             }),
         );
 
-        // 对每个命中跑 node --version
-        let mut executable_paths: Vec<FactValue> = Vec::new();
-        let mut version_map: BTreeMap<String, FactValue> = BTreeMap::new();
+        // 用 ctx.run 执行 node --version（使用 PATH 中的第一个 node）
         let mut evidence = Vec::new();
-        let mut found_versions = 0;
+        let outcome = ctx.run("node", &["--version"]);
+        evidence.push(evidence_from_command(
+            EvidenceKind::Command,
+            "node --version",
+            &outcome,
+        ));
 
-        for hit in &hits {
-            let path_str = hit.to_string_lossy().to_string();
-            executable_paths.push(FactValue::Path(path_str.clone()));
+        let mut version_map: BTreeMap<String, FactValue> = BTreeMap::new();
+        let found_versions = if outcome.ran && outcome.exit_code == Some(0) {
+            let version = outcome.stdout.trim().to_string();
+            let ver = version.strip_prefix('v').unwrap_or(&version);
+            version_map.insert("primary".to_string(), FactValue::Version(ver.to_string()));
+            1
+        } else {
+            0
+        };
 
-            let outcome = ctx.run(&path_str, &["--version"]);
-            evidence.push(evidence_from_command(
-                EvidenceKind::Command,
-                &format!("{path_str} --version"),
-                &outcome,
-            ));
+        // facts: 解析出的可执行路径集合（已脱敏）+ 版本
+        let executable_paths: Vec<FactValue> = hits
+            .iter()
+            .map(|h| FactValue::Path(h.to_string_lossy().to_string()))
+            .collect();
 
-            if outcome.ran && outcome.exit_code == Some(0) {
-                let version = outcome.stdout.trim().to_string();
-                // node --version 输出格式: v22.11.0
-                let ver = version.strip_prefix('v').unwrap_or(&version);
-                version_map.insert(path_str, FactValue::Version(ver.to_string()));
-                found_versions += 1;
-            }
-        }
-
-        // facts: 解析出的可执行路径集合 + 版本映射
         let mut facts = BTreeMap::new();
         facts.insert("executables".to_string(), FactValue::Set(executable_paths));
         facts.insert("versions".to_string(), FactValue::Map(version_map));
 
-        let status = if found_versions == hits.len() {
+        let status = if found_versions > 0 {
             DetectStatus::Ok
-        } else if found_versions > 0 {
-            DetectStatus::Degraded
         } else {
             DetectStatus::Error
         };
 
         let summary = match hits.len() {
             0 => "Node.js not found".to_string(),
-            1 => {
-                let ver = facts
+            n => {
+                let ver_text = facts
                     .get("versions")
                     .and_then(|v| {
                         if let FactValue::Map(m) = v {
-                            m.values().next().cloned()
+                            m.get("primary").cloned()
                         } else {
                             None
                         }
                     })
                     .map(|fv| format!("{fv:?}"))
                     .unwrap_or_else(|| "unknown".to_string());
-                format!("Node.js 1 installation, version {ver}")
+                format!("Node.js {n} installation(s), version {ver_text}")
             }
-            n => format!("Node.js {n} installations, {found_versions} version(s) detected"),
         };
 
         DetectorResult {
