@@ -39,16 +39,24 @@ fn decode_bytes(bytes: &[u8]) -> String {
     decode_ansi(bytes)
 }
 
-/// 判断是否像 UTF-16LE（偶数字节数 + 每隔一个字节是 0x00 只对 ASCII 有效，中文则不然）
+/// 判断是否像 UTF-16LE（偶数字节数 + 高位字节（奇数位）多为 0x00）。
+/// ⚠️ 必须检查**奇数位**（高位字节）：UTF-16LE 中 ASCII 字符是 `XX 00`，
+/// 低位非零、高位为零。T0 曾误用 `step_by(2)` 检查低位，导致 wsl.exe 的
+/// 无 BOM UTF-16LE 输出永远判 false → 走 GBK 解码 → 乱码。
 fn is_likely_utf16le(bytes: &[u8]) -> bool {
     if bytes.len() % 2 != 0 {
         return false;
     }
-    // 检查是否有过多零字节（UTF-16LE 中 ASCII 字符的高位字节为 0）
-    let zero_count = bytes.iter().step_by(2).filter(|&&b| b == 0).count();
     let total_pairs = bytes.len() / 2;
-    // 超过 40% 的 pair 有零高位 → 可能是 UTF-16LE
-    total_pairs > 0 && zero_count as f64 / total_pairs as f64 > 0.4
+    if total_pairs == 0 {
+        return false;
+    }
+    // 高位字节：位置 1, 3, 5, ...（ASCII 字符的高位为 0，中文字符的高位非 0）
+    let zero_high = bytes.iter().skip(1).step_by(2).filter(|&&b| b == 0).count();
+    // 超过 40% 的 pair 有零高位 → 可能是 UTF-16LE。
+    // 中文系统上 wsl --status 输出"默认版本: 2"这类中英混合文本，
+    // 中文部分高位非零，ASCII 部分高位为零，40% 阈值可区分。
+    zero_high as f64 / total_pairs as f64 > 0.4
 }
 
 fn decode_utf16le(bytes: &[u8]) -> String {
@@ -200,5 +208,18 @@ mod tests {
     #[test]
     fn decode_empty() {
         assert_eq!(decode_bytes(b""), "");
+    }
+
+    /// wsl.exe 的输出是无 BOM 的 UTF-16LE（中英混合）。
+    /// "默认版本: 2\r\n" 的 UTF-16LE 字节（无 BOM）→ 必须解出中文而不是 GBK 乱码。
+    #[test]
+    fn decode_wsl_utf16le_no_bom_mixed() {
+        // 默认版本: 2\r\n  的 UTF-16LE 编码（无 BOM）
+        let mut bytes = Vec::new();
+        for ch in "默认版本: 2\r\n".encode_utf16() {
+            bytes.extend_from_slice(&ch.to_le_bytes());
+        }
+        let result = decode_bytes(&bytes);
+        assert_eq!(result, "默认版本: 2\r\n");
     }
 }
