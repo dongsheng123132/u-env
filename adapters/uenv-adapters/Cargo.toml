@@ -1,0 +1,11 @@
+[package]
+name = "uenv-adapters"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "u-env adapters: 声明框架需要哪些 capability、依赖哪些 detector 的 fact（T3 起，诊断在 T5）。"
+
+[dependencies]
+uenv-core = { path = "../../crates/uenv-core" }
