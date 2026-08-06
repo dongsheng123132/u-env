@@ -31,7 +31,10 @@ fn main() {
         } => {
             run_doctor(&cli, &out, fail_on, from.as_ref(), *agent);
         }
-        Commands::Report { format, out: report_out } => {
+        Commands::Report {
+            format,
+            out: report_out,
+        } => {
             run_report(&cli, &out, format, report_out.as_ref());
         }
         Commands::Fingerprint { from } => {
@@ -228,7 +231,11 @@ fn run_report(cli: &Cli, out: &Output, format: &str, out_path: Option<&std::path
     // 算指纹（报告含指纹一节）
     if let Ok((fp, excluded)) = uenv_fingerprint::compute_fingerprint(&env) {
         if !excluded.is_empty() {
-            out.log(&format!("⚠️ 指纹缺少 {} 个 detector：{}", excluded.len(), excluded.join(", ")));
+            out.log(&format!(
+                "⚠️ 指纹缺少 {} 个 detector：{}",
+                excluded.len(),
+                excluded.join(", ")
+            ));
         }
         env.fingerprint = Some(fp);
     }
@@ -276,6 +283,10 @@ fn run_report(cli: &Cli, out: &Output, format: &str, out_path: Option<&std::path
             process::exit(1);
         }
         out.log(&format!("report written to {}", path.display()));
+    } else if format == "json" {
+        // 规格 §7.3 信封格式
+        let payload: serde_json::Value = serde_json::from_str(&rendered).unwrap_or_default();
+        out.json(true, Some(&payload), None, None);
     } else {
         out.text(&rendered);
     }

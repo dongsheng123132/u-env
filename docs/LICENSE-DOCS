@@ -1,0 +1,22 @@
+# Documentation License
+
+本文档（docs/ 与 README*.md 等文档文件）以 **Creative Commons Attribution 4.0 International (CC BY 4.0)** 授权。
+
+代码（crates/、adapters/、schemas/ 生成物等）以 Apache-2.0 授权，见根目录 LICENSE。
+
+CC BY 4.0 要点：可复制、分发、修改、商用，但必须署名并标明修改。
+完整条款：https://creativecommons.org/licenses/by/4.0/legalcode
+
+---
+
+# Documentation License
+
+The documentation files (docs/ and README*.md) are licensed under the
+**Creative Commons Attribution 4.0 International (CC BY 4.0)** license.
+
+Code (crates/, adapters/, schemas/ artifacts) is licensed under Apache-2.0,
+see the LICENSE file in the repository root.
+
+CC BY 4.0 allows copy, distribution, modification, and commercial use,
+provided you give appropriate credit and indicate changes.
+Full terms: https://creativecommons.org/licenses/by/4.0/legalcode
