@@ -1,0 +1,44 @@
+{
+  "A.Q1": {
+    "arm": "A",
+    "qid": "Q1",
+    "rounds": 5,
+    "item_accuracy": 1,
+    "n_items": 6
+  },
+  "A.Q2": {
+    "arm": "A",
+    "qid": "Q2",
+    "rounds": 5,
+    "item_accuracy": 1,
+    "n_items": 4
+  },
+  "A.Q3": {
+    "arm": "A",
+    "qid": "Q3",
+    "rounds": 5,
+    "item_accuracy": 0,
+    "n_items": 5
+  },
+  "C.Q1": {
+    "arm": "C",
+    "qid": "Q1",
+    "rounds": 5,
+    "item_accuracy": 1,
+    "n_items": 6
+  },
+  "C.Q2": {
+    "arm": "C",
+    "qid": "Q2",
+    "rounds": 5,
+    "item_accuracy": 1,
+    "n_items": 4
+  },
+  "C.Q3": {
+    "arm": "C",
+    "qid": "Q3",
+    "rounds": 5,
+    "item_accuracy": 0.96,
+    "n_items": 5
+  }
+}

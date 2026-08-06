@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>果蔬订单</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 560px; margin: 40px auto; padding: 0 16px; color: #222; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+  input.qty { width: 56px; }
+  .line-total { font-weight: 600; }
+  #grand-total { font-size: 1.3em; font-weight: 700; }
+  #form-error { color: #b00020; min-height: 1.2em; margin: 8px 0; }
+  button { padding: 8px 18px; font-size: 1em; cursor: pointer; }
+  #confirmation { display: none; border: 2px solid #1a7f37; background: #e6f4ea; padding: 16px; border-radius: 6px; }
+</style>
+</head>
+<body>
+  <nav id="site-nav">
+    <a href="#home">首页</a> · <a href="#products">全部商品</a> · <a href="#promotions">促销活动</a> · <a href="#help">帮助中心</a> · <a href="#contact">联系客服</a> · <a href="#about">关于我们</a>
+  </nav>
+  <h1>果蔬订单</h1>
+  <p>填写数量，点击「提交订单」。满 30 元包邮，当日达。售后无忧，坏果包赔。</p>
+
+  <form id="order-form">
+    <table id="items-table">
+      <thead>
+        <tr><th>商品</th><th>单价</th><th>数量</th><th>小计</th></tr>
+      </thead>
+      <tbody>
+        <tr class="product-row" data-idx="0">
+          <td class="pname">苹果</td><td class="price" data-price="10">10 元</td>
+          <td><input class="qty" data-idx="0" value="0" type="number" min="0" max="99"></td>
+          <td class="line-total" id="line-total-0">0 元</td>
+        </tr>
+        <tr class="product-row" data-idx="1">
+          <td class="pname">香蕉</td><td class="price" data-price="5">5 元</td>
+          <td><input class="qty" data-idx="1" value="0" type="number" min="0" max="99"></td>
+          <td class="line-total" id="line-total-1">0 元</td>
+        </tr>
+        <tr class="product-row" data-idx="2">
+          <td class="pname">橙子</td><td class="price" data-price="8">8 元</td>
+          <td><input class="qty" data-idx="2" value="0" type="number" min="0" max="99"></td>
+          <td class="line-total" id="line-total-2">0 元</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>总计：<span id="grand-total">0 元</span></p>
+    <div id="form-error"></div>
+    <button type="submit" id="submit-btn">提交订单</button>
+  </form>
+
+  <section id="confirmation">
+    <h2>订单已提交 ✅</h2>
+    <p>共 <span id="confirm-count">0</span> 件商品，应付 <span id="confirm-total">0 元</span>。</p>
+  </section>
+
+<script>
+  const prices = [10, 5, 8];
+  function fmt(n) { return n + ' 元'; }
+
+  function recalc() {
+    let grand = 0;
+    prices.forEach((price, i) => {
+      const input = document.querySelector('input.qty[data-idx="' + i + '"]');
+      const qty = Math.max(0, parseInt(input.value || '0', 10) || 0);
+      const line = price * qty;
+      grand += line;
+      document.getElementById('line-total-' + i).textContent = fmt(line);
+    });
+    document.getElementById('grand-total').textContent = fmt(grand);
+  }
+
+  document.querySelectorAll('input.qty').forEach(input => {
+    input.addEventListener('input', recalc);
+  });
+
+  document.getElementById('order-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const error = document.getElementById('form-error');
+    error.textContent = '';
+    let count = 0;
+    let ok = true;
+    document.querySelectorAll('input.qty').forEach(input => {
+      const v = parseInt(input.value || '0', 10);
+      if (!Number.isInteger(v) || v < 0 || v > 99) { ok = false; return; }
+      if (v > 0) count++;
+    });
+    if (!ok) {
+      error.textContent = '数量必须是 0-99 的整数';
+      return;
+    }
+    if (count === 0) {
+      error.textContent = '请至少选择一件商品';
+      return;
+    }
+    // 校验通过：隐藏表单，显示确认页
+    const grand = document.getElementById('grand-total').textContent;
+    document.getElementById('confirm-count').textContent = count;
+    document.getElementById('confirm-total').textContent = grand;
+    document.getElementById('confirmation').style.display = 'block';
+    document.getElementById('order-form').style.display = 'none';
+    location.hash = '#confirmed';
+  });
+
+  recalc();
+</script>
+
+  <footer id="site-footer">
+    <p>果蔬到家有限公司 · 注册地址：XX 市 XX 区 XX 路 1 号 · 统一社会信用代码：91110108MA01XXXXXX</p>
+    <p>食品经营许可证：JY123456789 · 客服热线：400-000-0000（工作日 9:00-18:00）· 售后邮箱：service@example.com</p>
+    <p>配送范围：本市中心城区 5 环内。生鲜商品不支持 7 天无理由退货，质量问题请于收货后 24 小时内反馈。</p>
+    <p>© 2026 果蔬到家 保留所有权利。本页面为测试页面，所有数据均为虚构，与任何真实商家无关。</p>
+  </footer>
+</body>
+</html>

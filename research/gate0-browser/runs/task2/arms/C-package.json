@@ -1,0 +1,186 @@
+{
+  "spec": "webredline/package/v0.1",
+  "identity": {
+    "url": "file:///D:/uking%E7%BC%96%E7%A8%8B/%E6%9C%AC%E5%A2%83%E5%8D%8F%E8%AE%AE/research/gate0-browser/fixtures/operable-page.html",
+    "title": "数据看板",
+    "hash": ""
+  },
+  "graph": {
+    "objects": [
+      {
+        "id": "page",
+        "type": "page",
+        "props": {
+          "title": "数据看板",
+          "hash": ""
+        }
+      },
+      {
+        "id": "in:kw-input",
+        "type": "input",
+        "props": {
+          "name": null,
+          "type": "text",
+          "value": "",
+          "placeholder": "搜索…"
+        }
+      },
+      {
+        "id": "btn:filter-btn",
+        "type": "button",
+        "props": {
+          "text": "应用筛选",
+          "disabled": false,
+          "visible": true
+        }
+      },
+      {
+        "id": "btn:refresh-btn",
+        "type": "button",
+        "props": {
+          "text": "刷新",
+          "disabled": false,
+          "visible": true
+        }
+      },
+      {
+        "id": "btn:toggle-detail-btn",
+        "type": "button",
+        "props": {
+          "text": "显示明细",
+          "disabled": false,
+          "visible": true
+        }
+      },
+      {
+        "id": "lnk:l0",
+        "type": "link",
+        "props": {
+          "text": "总览",
+          "href": "#dashboard"
+        }
+      },
+      {
+        "id": "lnk:l1",
+        "type": "link",
+        "props": {
+          "text": "报表",
+          "href": "#reports"
+        }
+      },
+      {
+        "id": "lnk:l2",
+        "type": "link",
+        "props": {
+          "text": "用户",
+          "href": "#users"
+        }
+      },
+      {
+        "id": "lnk:l3",
+        "type": "link",
+        "props": {
+          "text": "设置",
+          "href": "#settings"
+        }
+      },
+      {
+        "id": "lnk:l4",
+        "type": "link",
+        "props": {
+          "text": "文档",
+          "href": "#docs"
+        }
+      },
+      {
+        "id": "lnk:export-link",
+        "type": "link",
+        "props": {
+          "text": "导出报表",
+          "href": "#export"
+        }
+      },
+      {
+        "id": "sel:date-range",
+        "type": "select",
+        "props": {
+          "value": "7d",
+          "options": [
+            "7d:近 7 天",
+            "30d:近 30 天",
+            "90d:近 90 天"
+          ]
+        }
+      },
+      {
+        "id": "kv:metric-pv",
+        "type": "data",
+        "props": {
+          "text": "12,340",
+          "visible": true
+        }
+      },
+      {
+        "id": "kv:metric-cvr",
+        "type": "data",
+        "props": {
+          "text": "3.2%",
+          "visible": true
+        }
+      },
+      {
+        "id": "kv:metric-gmv",
+        "type": "data",
+        "props": {
+          "text": "¥86,500",
+          "visible": true
+        }
+      },
+      {
+        "id": "kv:detail",
+        "type": "data",
+        "props": {
+          "text": "明细\n    \n      日期PV\n      \n        08-012,100\n        08-022,380",
+          "visible": false
+        }
+      },
+      {
+        "id": "kv:site-nav",
+        "type": "container",
+        "props": {
+          "tag": "nav",
+          "visible": true
+        }
+      },
+      {
+        "id": "kv:detail",
+        "type": "container",
+        "props": {
+          "tag": "section",
+          "visible": false
+        }
+      },
+      {
+        "id": "kv:detail-table",
+        "type": "container",
+        "props": {
+          "tag": "table",
+          "visible": false
+        }
+      }
+    ],
+    "constraints": [
+      {
+        "id": "c:operable",
+        "kind": "invariant",
+        "relation": "可操作对象 = select + input + button + a 的并集，缺一不算完整",
+        "note": "枚举完整性检查"
+      }
+    ]
+  },
+  "atlas": "B-shot.png",
+  "evidence": {
+    "snapshot_ts": "2026-08-06T20:25:21.909Z",
+    "screenshot": "B-shot.png"
+  }
+}

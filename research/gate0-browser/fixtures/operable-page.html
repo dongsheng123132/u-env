@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>数据看板</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 32px auto; padding: 0 16px; color: #222; }
+  .card { border: 1px solid #ddd; border-radius: 8px; padding: 14px; margin: 12px 0; }
+  .row { display: flex; gap: 12px; align-items: center; margin: 8px 0; }
+  button, .btn { padding: 6px 14px; cursor: pointer; }
+  .muted { color: #888; }
+</style>
+</head>
+<body>
+  <nav id="site-nav">
+    <a href="#dashboard">总览</a> · <a href="#reports">报表</a> · <a href="#users">用户</a> · <a href="#settings">设置</a> · <a href="#docs">文档</a>
+  </nav>
+  <h1>数据看板</h1>
+  <p class="muted">运营控制台示例（静态页面，无后端）。数据每小时更新一次，手动刷新可强制同步。</p>
+
+  <section class="card">
+    <h2>筛选</h2>
+    <div class="row">
+      <label>日期范围 <select id="date-range">
+        <option value="7d">近 7 天</option>
+        <option value="30d">近 30 天</option>
+        <option value="90d">近 90 天</option>
+      </select></label>
+      <label>关键字 <input id="kw-input" type="text" placeholder="搜索…"></label>
+      <button id="filter-btn">应用筛选</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>指标</h2>
+    <div class="row">
+      <div>访问量 <strong id="metric-pv">12,340</strong></div>
+      <div>转化率 <strong id="metric-cvr">3.2%</strong></div>
+      <div>GMV <strong id="metric-gmv">¥86,500</strong></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>操作</h2>
+    <div class="row">
+      <a href="#export" id="export-link" class="btn">导出报表</a>
+      <button id="refresh-btn">刷新</button>
+      <button id="toggle-detail-btn">显示明细</button>
+    </div>
+  </section>
+
+  <section id="detail" style="display:none;" class="card">
+    <h2>明细</h2>
+    <table id="detail-table">
+      <thead><tr><th>日期</th><th>PV</th></tr></thead>
+      <tbody>
+        <tr><td>08-01</td><td>2,100</td></tr>
+        <tr><td>08-02</td><td>2,380</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+<script>
+  const btn = document.getElementById('toggle-detail-btn');
+  btn.addEventListener('click', () => {
+    const d = document.getElementById('detail');
+    d.style.display = d.style.display === 'none' ? 'block' : 'none';
+    btn.textContent = d.style.display === 'none' ? '显示明细' : '隐藏明细';
+  });
+</script>
+
+  <footer id="site-footer">
+    <p>© 2026 数据看板团队 · 内部工具 · 仅供授权用户使用 · 数据来源每日 02:00 全量同步</p>
+    <p>安全提示：请勿在公共网络环境下操作本系统。任何异常登录行为将被记录并审计。</p>
+  </footer>
+</body>
+</html>

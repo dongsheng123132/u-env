@@ -1,0 +1,15 @@
+{
+  "task": "task2",
+  "qid": "Q1",
+  "arm": "C",
+  "round": 1,
+  "prompt": "你是网页操作助手。下面给出一个网页的「表示」。页面处于初始未操作状态。\n请严格基于给出的表示回答后面的问题。不要编造表示里没有的信息。回答用中文，精炼。\n\n[页面表示 · 本象包]（identity + graph 对象图 + constraints 不变量声明；constraints 是页面必须满足的不变量，可据此推导与验证）\n{\"title\":\"数据看板\",\"hash\":\"\",\"graph\":{\"objects\":[{\"id\":\"page\",\"type\":\"page\",\"props\":{\"title\":\"数据看板\",\"hash\":\"\"}},{\"id\":\"in:kw-input\",\"type\":\"input\",\"props\":{\"name\":null,\"type\":\"text\",\"value\":\"\",\"placeholder\":\"搜索…\"}},{\"id\":\"btn:filter-btn\",\"type\":\"button\",\"props\":{\"text\":\"应用筛选\",\"disabled\":false,\"visible\":true}},{\"id\":\"btn:refresh-btn\",\"type\":\"button\",\"props\":{\"text\":\"刷新\",\"disabled\":false,\"visible\":true}},{\"id\":\"btn:toggle-detail-btn\",\"type\":\"button\",\"props\":{\"text\":\"显示明细\",\"disabled\":false,\"visible\":true}},{\"id\":\"lnk:l0\",\"type\":\"link\",\"props\":{\"text\":\"总览\",\"href\":\"#dashboard\"}},{\"id\":\"lnk:l1\",\"type\":\"link\",\"props\":{\"text\":\"报表\",\"href\":\"#reports\"}},{\"id\":\"lnk:l2\",\"type\":\"link\",\"props\":{\"text\":\"用户\",\"href\":\"#users\"}},{\"id\":\"lnk:l3\",\"type\":\"link\",\"props\":{\"text\":\"设置\",\"href\":\"#settings\"}},{\"id\":\"lnk:l4\",\"type\":\"link\",\"props\":{\"text\":\"文档\",\"href\":\"#docs\"}},{\"id\":\"lnk:export-link\",\"type\":\"link\",\"props\":{\"text\":\"导出报表\",\"href\":\"#export\"}},{\"id\":\"sel:date-range\",\"type\":\"select\",\"props\":{\"value\":\"7d\",\"options\":[\"7d:近 7 天\",\"30d:近 30 天\",\"90d:近 90 天\"]}},{\"id\":\"kv:metric-pv\",\"type\":\"data\",\"props\":{\"text\":\"12,340\",\"visible\":true}},{\"id\":\"kv:metric-cvr\",\"type\":\"data\",\"props\":{\"text\":\"3.2%\",\"visible\":true}},{\"id\":\"kv:metric-gmv\",\"type\":\"data\",\"props\":{\"text\":\"¥86,500\",\"visible\":true}},{\"id\":\"kv:detail\",\"type\":\"data\",\"props\":{\"text\":\"明细\\n    \\n      日期PV\\n      \\n        08-012,100\\n        08-022,380\",\"visible\":false}},{\"id\":\"kv:site-nav\",\"type\":\"container\",\"props\":{\"tag\":\"nav\",\"visible\":true}},{\"id\":\"kv:detail\",\"type\":\"container\",\"props\":{\"tag\":\"section\",\"visible\":false}},{\"id\":\"kv:detail-table\",\"type\":\"container\",\"props\":{\"tag\":\"table\",\"visible\":false}}],\"constraints\":[{\"id\":\"c:operable\",\"kind\":\"invariant\",\"relation\":\"可操作对象 = select + input + button + a 的并集，缺一不算完整\",\"note\":\"枚举完整性检查\"}]},\"atlas\":\"B-shot.png\"}\n\n[问题 Q1] 请列出这个页面里所有可操作对象（输入框/按钮/链接/下拉框），每个标注：类型、唯一标识（id）、用途。",
+  "output": "可操作对象如下：\n\n| 类型 | 唯一标识 | 用途 |\n|---|---|---|\n| 输入框 | `in:kw-input` | 搜索关键词输入（placeholder 为“搜索…”） |\n| 按钮 | `btn:filter-btn` | 应用筛选 |\n| 按钮 | `btn:refresh-btn` | 刷新 |\n| 按钮 | `btn:toggle-detail-btn` | 切换显示明细（当前文本“显示明细”） |\n| 链接 | `lnk:l0` | 跳转到总览（#dashboard） |\n| 链接 | `lnk:l1` | 跳转到报表（#reports） |\n| 链接 | `lnk:l2` | 跳转到用户（#users） |\n| 链接 | `lnk:l3` | 跳转到设置（#settings） |\n| 链接 | `lnk:l4` | 跳转到文档（#docs） |\n| 链接 | `lnk:export-link` | 导出报表（#export） |\n| 下拉框 | `sel:date-range` | 选择日期范围（当前值 7d，选项有近 7 天/30 天/90 天） |",
+  "finish": "stop",
+  "usage": {
+    "inputTokens": 799,
+    "outputTokens": 413,
+    "reasoningTokens": 147,
+    "ms": 4836
+  }
+}

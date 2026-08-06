@@ -1,0 +1,16 @@
+{
+  "A.Q1": {
+    "arm": "A",
+    "qid": "Q1",
+    "rounds": 5,
+    "item_accuracy": 0.333,
+    "n_items": 6
+  },
+  "C.Q1": {
+    "arm": "C",
+    "qid": "Q1",
+    "rounds": 5,
+    "item_accuracy": 1,
+    "n_items": 6
+  }
+}
