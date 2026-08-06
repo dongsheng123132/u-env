@@ -6,8 +6,8 @@ use std::collections::BTreeMap;
 #[allow(unused_imports)]
 use uenv_core::{DetectStatus, Environment, FactValue, Finding, Layer, Safety, Severity};
 
-use crate::helpers::{finding, FindingExt};
 use crate::Rule;
+use crate::helpers::{FindingExt, finding};
 
 pub struct FsProjectPathNonAscii;
 
@@ -27,8 +27,18 @@ impl Rule for FsProjectPathNonAscii {
         let fix_commands: &[&str] = &["echo \"建议路径只含 a-zA-Z0-9-_\""];
         let fix_rollback: &[&str] = &["（无法自动回滚——涉及项目迁移）"];
         let v = crate::helpers::fact_bool(env, "fs.project-location", "path_has_non_ascii");
-        let Some(true) = v else { return vec![]; };
-        vec![finding(self.id(), Severity::Warning, "项目路径含非 ASCII 字符", desc).with_fix(fix_safety, fix_explain, fix_commands, fix_rollback)]
+        let Some(true) = v else {
+            return vec![];
+        };
+        vec![
+            finding(
+                self.id(),
+                Severity::Warning,
+                "项目路径含非 ASCII 字符",
+                desc,
+            )
+            .with_fix(fix_safety, fix_explain, fix_commands, fix_rollback),
+        ]
     }
 }
 
@@ -39,8 +49,12 @@ mod tests {
     #[test]
     fn rule_triggers_and_silent() {
         let mut env = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env, "fs.project-location", Layer::Host,
-            BTreeMap::from([("path_has_non_ascii".to_string(), crate::test_utils::b(true))]));
+        crate::test_utils::with_detector(
+            &mut env,
+            "fs.project-location",
+            Layer::Host,
+            BTreeMap::from([("path_has_non_ascii".to_string(), crate::test_utils::b(true))]),
+        );
         assert_eq!(FsProjectPathNonAscii.evaluate(&env).len(), 1);
     }
 }

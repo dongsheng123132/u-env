@@ -132,16 +132,16 @@
         "free_bytes": {
           "map": {
             "C:": {
-              "int": 29708165120
+              "int": 27107463168
             },
             "D:": {
-              "int": 88078426112
+              "int": 87940030464
             },
             "X:": {
               "int": 13975150592
             },
             "Y:": {
-              "int": 8426348544
+              "int": 8385789952
             },
             "Z:": {
               "int": 15968038912
@@ -154,10 +154,10 @@
           "kind": "command",
           "source": "powershell Get-Volume | ConvertTo-Json",
           "exit_code": 0,
-          "excerpt": "[{\"DriveLetter\":\"C\",\"FileSystem\":\"NTFS\",\"Size\":511659282432,\"SizeRemaining\":29708165120},{\"DriveLetter\":\"Y\",\"FileSystem\":\"NTFS\",\"Size\":17178816512,\"SizeRemaining\":8426348544},{\"DriveLetter\":\"D\",\"FileSystem\":\"NTFS\",\"Size\":460387061760,\"SizeRemaining\":88078426112},{\"DriveLetter\":\"X\",\"FileSystem\":\"NTFS\",\"Size\":17360220160,\"SizeRemaining\":13975150592},{\"DriveLetter\":\"Z\",\"FileSystem\":\"NTFS\",\"Size\":17178816512,\"SizeRemaining\":15968038912}]\r\n"
+          "excerpt": "[{\"DriveLetter\":\"C\",\"FileSystem\":\"NTFS\",\"Size\":511659282432,\"SizeRemaining\":27107463168},{\"DriveLetter\":\"Y\",\"FileSystem\":\"NTFS\",\"Size\":17178816512,\"SizeRemaining\":8385789952},{\"DriveLetter\":\"D\",\"FileSystem\":\"NTFS\",\"Size\":460387061760,\"SizeRemaining\":87940030464},{\"DriveLetter\":\"X\",\"FileSystem\":\"NTFS\",\"Size\":17360220160,\"SizeRemaining\":13975150592},{\"DriveLetter\":\"Z\",\"FileSystem\":\"NTFS\",\"Size\":17178816512,\"SizeRemaining\":15968038912}]\r\n"
         }
       ],
-      "elapsed_ms": 2530
+      "elapsed_ms": 2627
     },
     "host.hardware": {
       "id": "host.hardware",
@@ -188,7 +188,7 @@
           "excerpt": "{\"cpu_name\":\"12th Gen Intel(R) Core(TM) i9-12900H\",\"cores\":14,\"ram\":68501889024,\"manufacturer\":\"LENOVO\",\"model\":\"82RF\"}\r\n"
         }
       ],
-      "elapsed_ms": 2428
+      "elapsed_ms": 2225
     },
     "net.proxy": {
       "id": "net.proxy",
@@ -249,7 +249,7 @@
           "excerpt": "http://127.0.0.1:7897\n"
         }
       ],
-      "elapsed_ms": 731
+      "elapsed_ms": 628
     },
     "path.analysis": {
       "id": "path.analysis",
@@ -478,7 +478,7 @@
           "excerpt": "D:\\uking编程\\本境协议\\target\\debug\\deps;D:\\uking编程\\本境协议\\target\\debug;C:\\Program Files\\Rust stable MSVC 1.88\\lib\\rustlib\\x86_64-pc-windows-msvc\\lib;C:\\Users\\<user>\\bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\local\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\<user>\\bin;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Links;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\jqlang.jq_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\sharkdp.bat_Microsoft.Winget.Source_8wekyb3d8bbwe\\bat-v0.26.1-x86_64-pc-windows-msvc;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\junegunn.fzf_Microsoft.Winget.Source_8wekyb3d8bbwe;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\BurntSushi.ripgrep.MSVC_Microsoft.Winget.Source_8wekyb3d8bbwe\\ripgrep-15.1.0-x86_64-pc-windows-msvc;C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.6.4.0_x64__8wekyb3d8bbwe;C:\\Users\\<user>\\.uking\\runtime\\python\\Scripts;C:\\Users\\<user>\\.uking\\runtime\\python;C:\\Users\\<user>\\AppData\\Roaming\\npm;C:\\Users\\<user>\\bin;C:\\Users\\<user>\\.local\\bin;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Windows\\System32\\OpenSSH;C:\\Program Files\\Go\\bin;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Rust stable MSVC 1.88\\bin;C:\\Program Files (x86)\\Tencent\\微信web开发者工具\\dll;C:\\Program Files\\PuTTY;C:\\Program Files\\Tailscale;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files\\WireGuard;C:\\Users\\<user>\\.uking\\shims;C:\\Users\\<user>\\.kimi-code\\bin;E:\\U-Hermes\\data\\home\\bin;Y:\\compare-upstream\\hermes-home\\hermes-agent\\venv\\Scripts;Y:\\compare-upstream\\hermes-home\\bin;C:\\Users\\<user>\\bin;Y:\\compare-upstream\\hermes-agent\\venv\\Scripts;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Windows\\System32\\OpenSSH;C:\\Program Files\\Go\\bin;C:\\Program Files\\dotnet;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files\\GitHub CLI;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\Rust stable MSVC 1.88\\bin;C:\\Program Files (x86)\\Tencent\\???web?????????\\dll;C:\\Program Files\\PuTTY;C:\\Program Files\\Tailscale;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Users\\<user>\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts;C:\\Users\\<user>\\.local\\bin;C:\\Users\\<user>\\Tools\\node\\node-v23.9.0-win-x64;C:\\Users\\<user>\\Tools\\dotnet;C:\\Users\\<user>\\.cargo\\bin;C:\\Users\\<user>\\AppData\\Local\\Programs\\Python\\Python311\\Scripts;C:\\Users\\<user>\\AppData\\Local\\Programs\\Python\\Python311;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\<user>\\go\\bin;C:\\Users\\<user>;J:\\U-Claw\\resources\\cli;Y:\\U-Claw\\resources\\cli;H:\\U-Claw\\resources\\cli;G:\\U-Claw\\resources\\cli;I:\\U-Claw\\resources\\cli;L:\\U-Claw\\resources\\cli;C:\\Program Files\\Notepad++;E:\\U-Claw\\resources\\cli;C:\\Users\\<user>\\.openclaw-autoclaw\\bin;C:\\Users\\<user>\\AppData\\Local\\Android\\Sdk\\platform-tools;Z:\\U-Claw\\resources\\cli;C:\\Users\\<user>\\.uking\\runtime\\python\\Scripts;F:\\U-Claw\\resources\\cli;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\JohnMacFarlane.Pandoc_Microsoft.Winget.Source_8wekyb3d8bbwe\\pandoc-3.10;C:\\Program Files\\ClawX\\resources\\cli;C:\\Users\\<user>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Syncthing.Syncthing_Microsoft.Winget.Source_8wekyb3d8bbwe\\syncthing-windows-amd64-v2.1.2;C:\\Users\\<user>\\.qoder-cn\\bin\\qoderclicn;C:\\Users\\<user>\\AppData\\Roaming\\npm;C:\\Program Files\\Git\\usr\\bin\\vendor_perl;C:\\Program Files\\Git\\usr\\bin\\core_perl"
         }
       ],
-      "elapsed_ms": 158
+      "elapsed_ms": 99
     },
     "project.drift": {
       "id": "project.drift",
@@ -527,7 +527,7 @@
           "str": "master"
         },
         "commit": {
-          "str": "5937eff67eb1"
+          "str": "31e5fb67cfd6"
         },
         "dirty": {
           "bool": true
@@ -548,13 +548,13 @@
           "kind": "command",
           "source": "git rev-parse HEAD",
           "exit_code": 0,
-          "excerpt": "5937eff67eb1bf4ae5efc184904ce9de94b8e737\n"
+          "excerpt": "31e5fb67cfd62a68304f145fb1b5fe5dc2fa6c63\n"
         },
         {
           "kind": "command",
           "source": "git status --porcelain",
           "exit_code": 0,
-          "excerpt": " M Cargo.lock\n M crates/uenv-cli/src/cli.rs\n M crates/uenv-cli/src/main.rs\n M crates/uenv-fingerprint/Cargo.toml\n M crates/uenv-fingerprint/src/lib.rs\n M crates/uenv-rules/src/lib.rs\n?? crates/uenv-fingerprint/src/diff.rs\n?? crates/uenv-fingerprint/src/fingerprint.rs\n?? crates/uenv-fingerprint/src/normalize.rs\n?? tasks/gen_t4_fixtures.py\n"
+          "excerpt": " M Cargo.lock\n M crates/uenv-cli/Cargo.toml\n M crates/uenv-cli/src/cli.rs\n M crates/uenv-cli/src/main.rs\n M crates/uenv-rules/src/lib.rs\n M tasks/gen_t4_fixtures.py\n?? tasks/gen_t5_rules.py\n"
         },
         {
           "kind": "command",
@@ -563,17 +563,23 @@
           "excerpt": ""
         }
       ],
-      "elapsed_ms": 1830
+      "elapsed_ms": 1227
     },
     "project.kind": {
       "id": "project.kind",
       "layer": "project",
       "title": "项目类型",
       "status": "ok",
-      "summary": "rust",
+      "summary": "tauri+node+rust",
       "facts": {
         "kinds": {
           "set": [
+            {
+              "str": "tauri"
+            },
+            {
+              "str": "node"
+            },
             {
               "str": "rust"
             }
@@ -582,7 +588,10 @@
         "markers": {
           "set": [
             {
-              "str": "Cargo.toml"
+              "str": "package.json"
+            },
+            {
+              "str": "tauri.conf.json"
             }
           ]
         }
@@ -601,7 +610,7 @@
         "lockfiles": {
           "map": {
             "Cargo.lock": {
-              "str": "8a89070647edd4c637fd683c7ed94ac0558328ff37e23609e982f5d5c4e34dea"
+              "str": "e5ad32ce5e1784ef27ada273ed4f19628be909f00ff5c93b89f9582fa329aebc"
             }
           }
         }
@@ -612,7 +621,7 @@
           "kind": "file",
           "source": "Cargo.lock",
           "exit_code": null,
-          "excerpt": "sha256:8a89070647edd4c637fd683c7ed94ac0558328ff37e23609e982f5d5c4e34dea"
+          "excerpt": "sha256:e5ad32ce5e1784ef27ada273ed4f19628be909f00ff5c93b89f9582fa329aebc"
         }
       ],
       "elapsed_ms": 0
@@ -693,7 +702,7 @@
           "excerpt": "\"N/A: Must be an administrator to view exclusions\"\r\n"
         }
       ],
-      "elapsed_ms": 4350
+      "elapsed_ms": 3647
     },
     "toolchain.dotnet": {
       "id": "toolchain.dotnet",
@@ -766,7 +775,7 @@
           "excerpt": "Microsoft.AspNetCore.App 10.0.7 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\nMicrosoft.NETCore.App 6.0.36 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\nMicrosoft.NETCore.App 7.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\nMicrosoft.NETCore.App 8.0.14 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\nMicrosoft.NETCore.App 9.0.5 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\nMicrosoft.NETCore.App 10.0.7 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\nMicrosoft.WindowsDesktop.App 6.0.36 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\nMicrosoft.WindowsDesktop.App 7.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\nMicrosoft.WindowsDesktop.App 8.0.14 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\nMicrosoft.WindowsDesktop.App 9.0.5 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\nMicrosoft.WindowsDesktop.App 10.0.7 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\n"
         }
       ],
-      "elapsed_ms": 265
+      "elapsed_ms": 212
     },
     "toolchain.git": {
       "id": "toolchain.git",
@@ -813,7 +822,7 @@
           "excerpt": "file:C:/Program Files/Git/etc/gitconfig\tdiff.astextplain.textconv=astextplain\nfile:C:/Program Files/Git/etc/gitconfig\tfilter.lfs.clean=git-lfs clean -- %f\nfile:C:/Program Files/Git/etc/gitconfig\tfilter.lfs.smudge=git-lfs smudge -- %f\nfile:C:/Program Files/Git/etc/gitconfig\tfilter.lfs.process=git-lfs filter-process\nfile:C:/Program Files/Git/etc/gitconfig\tfilter.lfs.required=true\nfile:C:/Program Files/Git/etc/gitconfig\thttp.sslbackend=openssl\nfile:C:/Program Files/Git/etc/gitconfig\thttp.sslcainfo=C:/Program Files/Git/mingw64/etc/ssl/certs/ca-bundle.crt\nfile:C:/Program Files/Git/etc/gitconfig\tcore.autocrlf=true\nfile:C:/Program Files/Git/etc/gitconfig\tcore.fscache=true\nfile:C:/Program Files/Git/etc/gitconfig\tcore.symlinks=false\nfile:C:/Program Files/Git/etc/gitconfig\tpull.rebase=false\nfile:C:/Program Files/Git/etc/gitconfig\tcredential.helper=manager\nfile:C:/Program Files/Git/etc/gitconfig\tcredential.https://dev.azure.com.usehttppath=true\nfile:C:/Program Files/Git/etc/gitconfig\tinit.defaultbranch=master\nfile:C:/Users/<user>/.gitconfig\tuser.name=hfshfg\nfile:C:/Users/<user>/.gitconfig\tuser.email=<redacted>\nfile:C:/Users/<user>/.gitconfig\tcredential.https://git.weixin.qq.com.provider=generic\nfile:C:/Users/<user>/.gitconfig\tcredential.helper=manager\nfile:C:/Users/<user>/.gitconfig\tcredential.https://gitee.com.provider=generic\nfile:C:/Users/<user>/.gitconfig\thttp.version=HTTP/1.1\nfile:C:/Users/<user>/.gitconfig\thttp.sslbackend=schannel\nfile:C:/Users/<user>/.gitconfig\thttp.postbuffer=157286400\nfile:C:/Users/<user>/.gitconfig\thttp.proxy=http://127.0.0.1:7897\nfile:C:/Users/<user>/.gitconfig\thttps.proxy=http://127.0.0.1:7897\nfile:C:/Users/<user>/.gitconfig\tsafe.directory=C:/Users/<user>/WeChatProjects/miniprogram-1\nfile:C:/Users/<user>/.gitconfig\twindows.appendatomically=false\nfile:C:/Users/<user>/.gitconfig\tcredential.https://huggingface.co.provider=generic\nfile:C:/Users/<user>/.gitconfig\tsafe.directory=*\nfile:C:/Users/<user>/.gitconfig\tsafe.directory=*\nfile:C:/Users/<user>/.git"
         }
       ],
-      "elapsed_ms": 325
+      "elapsed_ms": 211
     },
     "toolchain.msvc": {
       "id": "toolchain.msvc",
@@ -859,7 +868,7 @@
           "excerpt": "[\r\n  {\r\n    \"instanceId\": \"167a8d60\",\r\n    \"installDate\": \"2025-04-18T13:35:45Z\",\r\n    \"installationName\": \"VisualStudio/16.11.46+35931.194\",\r\n    \"installationPath\": \"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\2019\\\\BuildTools\",\r\n    \"installationVersion\": \"16.11.35931.194\",\r\n    \"productId\": \"Microsoft.VisualStudio.Product.BuildTools\",\r\n    \"productPath\": \"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\2019\\\\BuildTools\\\\Common7\\\\Tools\\\\LaunchDevCmd.bat\",\r\n    \"state\": 4294967295,\r\n    \"isComplete\": true,\r\n    \"isLaunchable\": true,\r\n    \"isPrerelease\": false,\r\n    \"isRebootRequired\": false,\r\n    \"displayName\": \"Visual Studio 生成工具 2019\",\r\n    \"description\": \"Visual Studio 生成工具允许生成本机和基于 MSBuild 的托管 .NET 应用程序，而不需要 Visual Studio IDE。还可以选择安装 Visual C++ 编译器和库、MFC、ALT 和 C++/CLI 支持。\",\r\n    \"channelId\": \"VisualStudio.16.Release\",\r\n    \"channelUri\": \"https://aka.ms/vs/16/release/channel\",\r\n    \"enginePath\": \"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\Installer\\\\resources\\\\app\\\\ServiceHub\\\\Services\\\\Microsoft.VisualStudio.Setup.Service\",\r\n    \"installedChannelId\": \"VisualStudio.16.Release\",\r\n    \"installedChannelUri\": \"https://aka.ms/vs/16/release/channel\",\r\n    \"releaseNotes\": \"https://docs.microsoft.com/en-us/visualstudio/releases/2019/release-notes-v16.11#16.11.46\",\r\n    \"resolvedInstallationPath\": \"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\2019\\\\BuildTools\",\r\n    \"thirdPartyNotices\": \"https://go.microsoft.com/fwlink/?LinkId=660909\",\r\n    \"updateDate\": \"2025-04-18T13:35:45.4900318Z\",\r\n    \"catalog\": {\r\n      \"buildBranch\": \"d16.11\",\r\n      \"buildVersion\": \"16.11.35931.194\",\r\n      \"id\": \"VisualStudio/16.11.46+35931.194\",\r\n      \"localBuild\": \"build-lab\",\r\n      \"manifestName\": \"VisualStudio\",\r\n      \"manifestType\": \"installer\",\r\n      \"productDisplayVersion\": \"16.11.46\",\r\n      \"productLine\": \"Dev16\",\r\n      \"productLineVersion\": \"2019\",\r\n      \"productM"
         }
       ],
-      "elapsed_ms": 121
+      "elapsed_ms": 108
     },
     "toolchain.node": {
       "id": "toolchain.node",
@@ -958,7 +967,7 @@
           "excerpt": "0.31.0\n"
         }
       ],
-      "elapsed_ms": 3457
+      "elapsed_ms": 2745
     },
     "toolchain.python": {
       "id": "toolchain.python",
@@ -1011,7 +1020,7 @@
           "excerpt": "Python 3.11.9\r\n"
         }
       ],
-      "elapsed_ms": 242
+      "elapsed_ms": 224
     },
     "toolchain.rust": {
       "id": "toolchain.rust",
@@ -1133,7 +1142,7 @@
           "excerpt": "zh-CN\r\n"
         }
       ],
-      "elapsed_ms": 1648
+      "elapsed_ms": 1642
     },
     "windows.long-paths": {
       "id": "windows.long-paths",
@@ -1182,7 +1191,7 @@
           "excerpt": "7.6.4\r\n"
         }
       ],
-      "elapsed_ms": 1418
+      "elapsed_ms": 1309
     },
     "windows.version": {
       "id": "windows.version",
@@ -1296,7 +1305,7 @@
           "excerpt": "WSL 版本： 2.4.13.0\r\n内核版本： 5.15.167.4-1\r\nWSLg 版本： 1.0.65\r\nMSRDC 版本： 1.2.5716\r\nDirect3D 版本： 1.611.1-81528511\r\nDXCore 版本： 10.0.26100.1-240331-1435.ge-release\r\nWindows 版本： 10.0.22631.6199\r\n"
         }
       ],
-      "elapsed_ms": 316
+      "elapsed_ms": 317
     }
   },
   "fingerprint": null

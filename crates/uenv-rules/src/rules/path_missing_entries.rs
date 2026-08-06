@@ -4,8 +4,8 @@
 #[allow(unused_imports)]
 use uenv_core::{Environment, Finding, Safety, Severity};
 
-use crate::helpers::{fact_collection_len, finding, FindingExt};
 use crate::Rule;
+use crate::helpers::{FindingExt, fact_collection_len, finding};
 
 pub struct PathMissingEntries;
 
@@ -55,19 +55,27 @@ mod tests {
     #[test]
     fn triggers_on_missing() {
         let mut env = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env, "path.analysis", Layer::Toolchain,
+        crate::test_utils::with_detector(
+            &mut env,
+            "path.analysis",
+            Layer::Toolchain,
             BTreeMap::from([(
                 "missing".to_string(),
                 FactValue::Set(vec![FactValue::Str("D:\\gone".to_string())]),
-            )]));
+            )]),
+        );
         assert_eq!(PathMissingEntries.evaluate(&env).len(), 1);
     }
 
     #[test]
     fn silent_ok_path() {
         let mut env = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env, "path.analysis", Layer::Toolchain,
-            BTreeMap::from([("missing".to_string(), FactValue::Set(vec![]))]));
+        crate::test_utils::with_detector(
+            &mut env,
+            "path.analysis",
+            Layer::Toolchain,
+            BTreeMap::from([("missing".to_string(), FactValue::Set(vec![]))]),
+        );
         assert_eq!(PathMissingEntries.evaluate(&env).len(), 0);
     }
 }

@@ -6,8 +6,8 @@ use std::collections::BTreeMap;
 #[allow(unused_imports)]
 use uenv_core::{DetectStatus, Environment, FactValue, Finding, Layer, Safety, Severity};
 
-use crate::helpers::{finding, FindingExt};
 use crate::Rule;
+use crate::helpers::{FindingExt, finding};
 
 pub struct NetProxyInconsistent;
 
@@ -24,11 +24,22 @@ impl Rule for NetProxyInconsistent {
         let desc = "系统代理（注册表）和 HTTP_PROXY/HTTPS_PROXY 环境变量指向不同代理，或一边有一边没有。npm/git 走环境变量代理，浏览器走系统代理，两边不一致时「npm 能装但浏览器翻不了墙」或反之，排查网络问题会两头猜。统一到同一个代理地址。";
         let fix_safety = Safety::Confirm;
         let fix_explain = "统一代理配置（以系统代理为准同步环境变量）";
-        let fix_commands: &[&str] = &["echo \"在系统设置中确认代理地址后，同步设置 HTTP_PROXY/HTTPS_PROXY 环境变量\""];
+        let fix_commands: &[&str] =
+            &["echo \"在系统设置中确认代理地址后，同步设置 HTTP_PROXY/HTTPS_PROXY 环境变量\""];
         let fix_rollback: &[&str] = &["（手动恢复原环境变量）"];
         let v = crate::helpers::fact_bool(env, "net.proxy", "consistent");
-        let Some(false) = v else { return vec![]; };
-        vec![finding(self.id(), Severity::Warning, "系统代理与环境变量代理不一致", desc).with_fix(fix_safety, fix_explain, fix_commands, fix_rollback)]
+        let Some(false) = v else {
+            return vec![];
+        };
+        vec![
+            finding(
+                self.id(),
+                Severity::Warning,
+                "系统代理与环境变量代理不一致",
+                desc,
+            )
+            .with_fix(fix_safety, fix_explain, fix_commands, fix_rollback),
+        ]
     }
 }
 
@@ -39,13 +50,21 @@ mod tests {
     #[test]
     fn rule_triggers_and_silent() {
         let mut env = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env, "net.proxy", Layer::Host,
-            BTreeMap::from([("consistent".to_string(), crate::test_utils::b(false))]));
+        crate::test_utils::with_detector(
+            &mut env,
+            "net.proxy",
+            Layer::Host,
+            BTreeMap::from([("consistent".to_string(), crate::test_utils::b(false))]),
+        );
         assert_eq!(NetProxyInconsistent.evaluate(&env).len(), 1);
 
         let mut env2 = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env2, "net.proxy", Layer::Host,
-            BTreeMap::from([("consistent".to_string(), crate::test_utils::b(true))]));
+        crate::test_utils::with_detector(
+            &mut env2,
+            "net.proxy",
+            Layer::Host,
+            BTreeMap::from([("consistent".to_string(), crate::test_utils::b(true))]),
+        );
         assert_eq!(NetProxyInconsistent.evaluate(&env2).len(), 0);
     }
 }

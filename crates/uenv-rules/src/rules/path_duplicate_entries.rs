@@ -4,8 +4,8 @@
 #[allow(unused_imports)]
 use uenv_core::{Environment, Finding, Safety, Severity};
 
-use crate::helpers::{fact_collection_len, finding, FindingExt};
 use crate::Rule;
+use crate::helpers::{FindingExt, fact_collection_len, finding};
 
 pub struct PathDuplicateEntries;
 
@@ -55,11 +55,15 @@ mod tests {
     #[test]
     fn triggers_on_duplicates() {
         let mut env = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env, "path.analysis", Layer::Toolchain,
+        crate::test_utils::with_detector(
+            &mut env,
+            "path.analysis",
+            Layer::Toolchain,
             BTreeMap::from([(
                 "duplicates".to_string(),
                 FactValue::Set(vec![FactValue::Str("c:\\windows".to_string())]),
-            )]));
+            )]),
+        );
         assert_eq!(PathDuplicateEntries.evaluate(&env).len(), 1);
         // fix 存在且 commands/rollback 非空
         let f = &PathDuplicateEntries.evaluate(&env)[0];
@@ -71,9 +75,18 @@ mod tests {
     #[test]
     fn silent_without_duplicates() {
         let mut env = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env, "path.analysis", Layer::Toolchain,
-            BTreeMap::new());
+        crate::test_utils::with_detector(
+            &mut env,
+            "path.analysis",
+            Layer::Toolchain,
+            BTreeMap::new(),
+        );
         assert_eq!(PathDuplicateEntries.evaluate(&env).len(), 0);
-        assert_eq!(PathDuplicateEntries.evaluate(&crate::test_utils::empty_env()).len(), 0);
+        assert_eq!(
+            PathDuplicateEntries
+                .evaluate(&crate::test_utils::empty_env())
+                .len(),
+            0
+        );
     }
 }

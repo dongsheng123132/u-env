@@ -4,8 +4,8 @@
 #[allow(unused_imports)]
 use uenv_core::{Environment, Finding, Safety, Severity};
 
-use crate::helpers::{fact_collection_len, finding, FindingExt};
 use crate::Rule;
+use crate::helpers::{FindingExt, fact_collection_len, finding};
 
 pub struct RustMultipleCargoInPath;
 
@@ -58,8 +58,12 @@ mod tests {
         let paths: Vec<FactValue> = (0..n)
             .map(|i| FactValue::Path(format!("C:\\cargo-{i}\\cargo.exe")))
             .collect();
-        crate::test_utils::with_detector(&mut env, "toolchain.rust", Layer::Toolchain,
-            BTreeMap::from([("cargo_paths".to_string(), FactValue::Set(paths))]));
+        crate::test_utils::with_detector(
+            &mut env,
+            "toolchain.rust",
+            Layer::Toolchain,
+            BTreeMap::from([("cargo_paths".to_string(), FactValue::Set(paths))]),
+        );
         env
     }
 
@@ -72,6 +76,11 @@ mod tests {
 
     #[test]
     fn silent_single() {
-        assert_eq!(RustMultipleCargoInPath.evaluate(&env_with_cargo_count(1)).len(), 0);
+        assert_eq!(
+            RustMultipleCargoInPath
+                .evaluate(&env_with_cargo_count(1))
+                .len(),
+            0
+        );
     }
 }

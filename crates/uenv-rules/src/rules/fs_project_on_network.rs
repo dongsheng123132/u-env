@@ -6,8 +6,8 @@ use std::collections::BTreeMap;
 #[allow(unused_imports)]
 use uenv_core::{DetectStatus, Environment, FactValue, Finding, Layer, Safety, Severity};
 
-use crate::helpers::{finding, FindingExt};
 use crate::Rule;
+use crate::helpers::{FindingExt, finding};
 
 pub struct FsProjectOnNetwork;
 
@@ -27,8 +27,17 @@ impl Rule for FsProjectOnNetwork {
         let fix_commands: &[&str] = &["echo \"复制到本地：robocopy Z:\\proj C:\\dev\\proj /E\""];
         let fix_rollback: &[&str] = &["（无法自动回滚——涉及项目迁移）"];
         let on = crate::helpers::fact_bool(env, "fs.project-location", "on_network");
-        let Some(true) = on else { return vec![]; };
-        vec![finding(self.id(), Severity::Error, "项目在网络盘上", desc).with_fix(fix_safety, fix_explain, fix_commands, fix_rollback)]
+        let Some(true) = on else {
+            return vec![];
+        };
+        vec![
+            finding(self.id(), Severity::Error, "项目在网络盘上", desc).with_fix(
+                fix_safety,
+                fix_explain,
+                fix_commands,
+                fix_rollback,
+            ),
+        ]
     }
 }
 
@@ -39,9 +48,18 @@ mod tests {
     #[test]
     fn rule_triggers_and_silent() {
         let mut env = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env, "fs.project-location", Layer::Host,
-            BTreeMap::from([("on_network".to_string(), crate::test_utils::b(true))]));
+        crate::test_utils::with_detector(
+            &mut env,
+            "fs.project-location",
+            Layer::Host,
+            BTreeMap::from([("on_network".to_string(), crate::test_utils::b(true))]),
+        );
         assert_eq!(FsProjectOnNetwork.evaluate(&env).len(), 1);
-        assert_eq!(FsProjectOnNetwork.evaluate(&crate::test_utils::empty_env()).len(), 0);
+        assert_eq!(
+            FsProjectOnNetwork
+                .evaluate(&crate::test_utils::empty_env())
+                .len(),
+            0
+        );
     }
 }

@@ -6,8 +6,8 @@ use std::collections::BTreeMap;
 #[allow(unused_imports)]
 use uenv_core::{DetectStatus, Environment, FactValue, Finding, Layer, Safety, Severity};
 
-use crate::helpers::{finding, FindingExt};
 use crate::Rule;
+use crate::helpers::{FindingExt, finding};
 
 pub struct Webview2Missing;
 
@@ -24,13 +24,25 @@ impl Rule for Webview2Missing {
         let desc = "Tauri/Electron 项目在 Windows 上依赖 WebView2 Runtime（Evergreen）。未安装时应用启动直接白屏或报「找不到 WebView2」。Win10 较新版本自带，但 Win10 旧版和精简版需要手动装 Evergreen Runtime。";
         let fix_safety = Safety::Confirm;
         let fix_explain = "下载安装 WebView2 Evergreen Runtime";
-        let fix_commands: &[&str] = &["start https://developer.microsoft.com/microsoft-edge/webview2/"];
+        let fix_commands: &[&str] =
+            &["start https://developer.microsoft.com/microsoft-edge/webview2/"];
         let fix_rollback: &[&str] = &["（卸载 WebView2 Runtime）"];
         let installed = crate::helpers::fact_bool(env, "runtime.webview2", "installed");
-        let Some(false) = installed else { return vec![]; };
+        let Some(false) = installed else {
+            return vec![];
+        };
         if crate::helpers::kind_is(env, "tauri") || crate::helpers::kind_is(env, "electron") {
-            vec![finding(self.id(), Severity::Error, "WebView2 Runtime 未安装", desc).with_fix(fix_safety, fix_explain, fix_commands, fix_rollback)]
-        } else { vec![] }
+            vec![
+                finding(self.id(), Severity::Error, "WebView2 Runtime 未安装", desc).with_fix(
+                    fix_safety,
+                    fix_explain,
+                    fix_commands,
+                    fix_rollback,
+                ),
+            ]
+        } else {
+            vec![]
+        }
     }
 }
 
@@ -41,14 +53,22 @@ mod tests {
     #[test]
     fn rule_triggers_and_silent() {
         let mut env = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env, "runtime.webview2", Layer::Toolchain,
-            BTreeMap::from([("installed".to_string(), crate::test_utils::b(false))]));
+        crate::test_utils::with_detector(
+            &mut env,
+            "runtime.webview2",
+            Layer::Toolchain,
+            BTreeMap::from([("installed".to_string(), crate::test_utils::b(false))]),
+        );
         crate::test_utils::with_project_kinds(&mut env, &["tauri"]);
         assert_eq!(Webview2Missing.evaluate(&env).len(), 1);
 
         let mut env2 = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env2, "runtime.webview2", Layer::Toolchain,
-            BTreeMap::from([("installed".to_string(), crate::test_utils::b(true))]));
+        crate::test_utils::with_detector(
+            &mut env2,
+            "runtime.webview2",
+            Layer::Toolchain,
+            BTreeMap::from([("installed".to_string(), crate::test_utils::b(true))]),
+        );
         crate::test_utils::with_project_kinds(&mut env2, &["tauri"]);
         assert_eq!(Webview2Missing.evaluate(&env2).len(), 0);
     }

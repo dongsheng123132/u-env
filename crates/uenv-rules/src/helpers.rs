@@ -122,12 +122,7 @@ pub fn lockfile_names(env: &Environment) -> Vec<String> {
 }
 
 /// 构造一条 Finding 的快捷方式
-pub fn finding(
-    rule_id: &str,
-    severity: Severity,
-    title: &str,
-    description: &str,
-) -> Finding {
+pub fn finding(rule_id: &str, severity: Severity, title: &str, description: &str) -> Finding {
     Finding {
         rule_id: rule_id.to_string(),
         severity,
@@ -140,13 +135,7 @@ pub fn finding(
 
 /// Finding 扩展：挂 SuggestedFix（commands 非空则 rollback 必须非空）
 pub trait FindingExt {
-    fn with_fix(
-        self,
-        safety: Safety,
-        explain: &str,
-        commands: &[&str],
-        rollback: &[&str],
-    ) -> Self;
+    fn with_fix(self, safety: Safety, explain: &str, commands: &[&str], rollback: &[&str]) -> Self;
 }
 
 impl FindingExt for Finding {

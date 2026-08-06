@@ -6,8 +6,8 @@ use std::collections::BTreeMap;
 #[allow(unused_imports)]
 use uenv_core::{DetectStatus, Environment, FactValue, Finding, Layer, Safety, Severity};
 
-use crate::helpers::{finding, FindingExt};
 use crate::Rule;
+use crate::helpers::{FindingExt, finding};
 
 pub struct FsProjectPathHasSpace;
 
@@ -27,10 +27,21 @@ impl Rule for FsProjectPathHasSpace {
         let fix_commands: &[&str] = &["echo \"建议路径不含空格，如 C:\\dev\\my-app\""];
         let fix_rollback: &[&str] = &["（无法自动回滚）"];
         let v = crate::helpers::fact_bool(env, "fs.project-location", "path_has_space");
-        let Some(true) = v else { return vec![]; };
+        let Some(true) = v else {
+            return vec![];
+        };
         if crate::helpers::kind_is(env, "rust") || crate::helpers::kind_is(env, "tauri") {
-            vec![finding(self.id(), Severity::Info, "项目路径含空格", desc).with_fix(fix_safety, fix_explain, fix_commands, fix_rollback)]
-        } else { vec![] }
+            vec![
+                finding(self.id(), Severity::Info, "项目路径含空格", desc).with_fix(
+                    fix_safety,
+                    fix_explain,
+                    fix_commands,
+                    fix_rollback,
+                ),
+            ]
+        } else {
+            vec![]
+        }
     }
 }
 
@@ -41,8 +52,12 @@ mod tests {
     #[test]
     fn rule_triggers_and_silent() {
         let mut env = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env, "fs.project-location", Layer::Host,
-            BTreeMap::from([("path_has_space".to_string(), crate::test_utils::b(true))]));
+        crate::test_utils::with_detector(
+            &mut env,
+            "fs.project-location",
+            Layer::Host,
+            BTreeMap::from([("path_has_space".to_string(), crate::test_utils::b(true))]),
+        );
         crate::test_utils::with_project_kinds(&mut env, &["rust"]);
         assert_eq!(FsProjectPathHasSpace.evaluate(&env).len(), 1);
     }

@@ -6,8 +6,8 @@ use std::collections::BTreeMap;
 #[allow(unused_imports)]
 use uenv_core::{DetectStatus, Environment, FactValue, Finding, Layer, Safety, Severity};
 
-use crate::helpers::{finding, FindingExt};
 use crate::Rule;
+use crate::helpers::{FindingExt, finding};
 
 pub struct GitLongpathsDisabled;
 
@@ -29,11 +29,29 @@ impl Rule for GitLongpathsDisabled {
         let v = crate::helpers::fact_str(env, "toolchain.git", "longpaths");
         let Some(v) = v else {
             // 未配置默认关 → 触发（保守：宁报勿漏）
-            return vec![finding(self.id(), Severity::Warning, "git core.longpaths 未开启", desc).with_fix(fix_safety, fix_explain, fix_commands, fix_rollback)];
+            return vec![
+                finding(
+                    self.id(),
+                    Severity::Warning,
+                    "git core.longpaths 未开启",
+                    desc,
+                )
+                .with_fix(fix_safety, fix_explain, fix_commands, fix_rollback),
+            ];
         };
         if !v.eq_ignore_ascii_case("true") {
-            vec![finding(self.id(), Severity::Warning, "git core.longpaths 未开启", desc).with_fix(fix_safety, fix_explain, fix_commands, fix_rollback)]
-        } else { vec![] }
+            vec![
+                finding(
+                    self.id(),
+                    Severity::Warning,
+                    "git core.longpaths 未开启",
+                    desc,
+                )
+                .with_fix(fix_safety, fix_explain, fix_commands, fix_rollback),
+            ]
+        } else {
+            vec![]
+        }
     }
 }
 
@@ -44,13 +62,21 @@ mod tests {
     #[test]
     fn rule_triggers_and_silent() {
         let mut env = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env, "toolchain.git", Layer::Toolchain,
-            BTreeMap::from([("longpaths".to_string(), crate::test_utils::s("true"))]));
+        crate::test_utils::with_detector(
+            &mut env,
+            "toolchain.git",
+            Layer::Toolchain,
+            BTreeMap::from([("longpaths".to_string(), crate::test_utils::s("true"))]),
+        );
         assert_eq!(GitLongpathsDisabled.evaluate(&env).len(), 0);
 
         let mut env2 = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env2, "toolchain.git", Layer::Toolchain,
-            BTreeMap::from([("longpaths".to_string(), crate::test_utils::s("false"))]));
+        crate::test_utils::with_detector(
+            &mut env2,
+            "toolchain.git",
+            Layer::Toolchain,
+            BTreeMap::from([("longpaths".to_string(), crate::test_utils::s("false"))]),
+        );
         assert_eq!(GitLongpathsDisabled.evaluate(&env2).len(), 1);
     }
 }

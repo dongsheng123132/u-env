@@ -1,9 +1,11 @@
 // 测试工具：构造 Environment fixture。仅在测试中使用。
-#![cfg(test)]
 
 use std::collections::BTreeMap;
 
-use uenv_core::{DetectStatus, DetectorRecord, Environment, EnvironmentIdentity, FactValue, Layer, OperatingSystem};
+use uenv_core::{
+    DetectStatus, DetectorRecord, Environment, EnvironmentIdentity, FactValue, Layer,
+    OperatingSystem,
+};
 
 /// 空环境
 pub fn empty_env() -> Environment {
@@ -80,7 +82,12 @@ pub fn with_project_kinds(env: &mut Environment, kinds: &[&str]) {
         Layer::Project,
         BTreeMap::from([(
             "kinds".to_string(),
-            FactValue::Set(kinds.iter().map(|k| FactValue::Str(k.to_string())).collect()),
+            FactValue::Set(
+                kinds
+                    .iter()
+                    .map(|k| FactValue::Str(k.to_string()))
+                    .collect(),
+            ),
         )]),
     );
 }
@@ -95,5 +102,10 @@ pub fn i(v: i64) -> FactValue {
     FactValue::Int(v)
 }
 pub fn set_str(items: &[&str]) -> FactValue {
-    FactValue::Set(items.iter().map(|s| FactValue::Str(s.to_string())).collect())
+    FactValue::Set(
+        items
+            .iter()
+            .map(|s| FactValue::Str(s.to_string()))
+            .collect(),
+    )
 }

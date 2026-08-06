@@ -52,6 +52,14 @@ pub enum Commands {
         /// 失败阈值：none | warning | error
         #[arg(long, default_value = "error")]
         fail_on: String,
+
+        /// 从已有快照文件诊断（缺省 = 现场 scan）
+        #[arg(long)]
+        from: Option<PathBuf>,
+
+        /// agent 模式 = --json --quiet --no-input --fail-on error（给 AI 用）
+        #[arg(long)]
+        agent: bool,
     },
 
     /// 生成报告（markdown / json）

@@ -6,8 +6,8 @@ use std::collections::BTreeMap;
 #[allow(unused_imports)]
 use uenv_core::{DetectStatus, Environment, FactValue, Finding, Layer, Safety, Severity};
 
-use crate::helpers::{finding, FindingExt};
 use crate::Rule;
+use crate::helpers::{FindingExt, finding};
 
 pub struct FsProjectOnOnedrive;
 
@@ -27,8 +27,17 @@ impl Rule for FsProjectOnOnedrive {
         let fix_commands: &[&str] = &["echo \"移动项目：move D:\\OneDrive\\proj C:\\dev\\proj\""];
         let fix_rollback: &[&str] = &["（无法自动回滚——涉及项目迁移）"];
         let on = crate::helpers::fact_bool(env, "fs.project-location", "on_onedrive");
-        let Some(true) = on else { return vec![]; };
-        vec![finding(self.id(), Severity::Error, "项目在 OneDrive 目录里", desc).with_fix(fix_safety, fix_explain, fix_commands, fix_rollback)]
+        let Some(true) = on else {
+            return vec![];
+        };
+        vec![
+            finding(self.id(), Severity::Error, "项目在 OneDrive 目录里", desc).with_fix(
+                fix_safety,
+                fix_explain,
+                fix_commands,
+                fix_rollback,
+            ),
+        ]
     }
 }
 
@@ -39,13 +48,21 @@ mod tests {
     #[test]
     fn rule_triggers_and_silent() {
         let mut env = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env, "fs.project-location", Layer::Host,
-            BTreeMap::from([("on_onedrive".to_string(), crate::test_utils::b(true))]));
+        crate::test_utils::with_detector(
+            &mut env,
+            "fs.project-location",
+            Layer::Host,
+            BTreeMap::from([("on_onedrive".to_string(), crate::test_utils::b(true))]),
+        );
         assert_eq!(FsProjectOnOnedrive.evaluate(&env).len(), 1);
 
         let mut env2 = crate::test_utils::empty_env();
-        crate::test_utils::with_detector(&mut env2, "fs.project-location", Layer::Host,
-            BTreeMap::from([("on_onedrive".to_string(), crate::test_utils::b(false))]));
+        crate::test_utils::with_detector(
+            &mut env2,
+            "fs.project-location",
+            Layer::Host,
+            BTreeMap::from([("on_onedrive".to_string(), crate::test_utils::b(false))]),
+        );
         assert_eq!(FsProjectOnOnedrive.evaluate(&env2).len(), 0);
     }
 }

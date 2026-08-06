@@ -6,7 +6,10 @@ use std::process;
 use std::time::Instant;
 
 use clap::Parser;
-use uenv_core::{DetectStatus, DetectorRecord, Environment, EnvironmentIdentity, OperatingSystem};
+use uenv_core::{
+    DetectStatus, DetectorRecord, Environment, EnvironmentIdentity, Finding, OperatingSystem,
+    Severity,
+};
 use uenv_scanner::context::ScanContext;
 use uenv_scanner::registry::all_detectors;
 
@@ -21,12 +24,12 @@ fn main() {
         Commands::Scan { out: out_path } => {
             run_scan(&cli, &out, out_path.as_ref());
         }
-        Commands::Doctor { fail_on: _ } => {
-            out.log("uenv doctor: not implemented yet");
-            if cli.json {
-                out.json(false, None::<()>, Some("not implemented yet".into()), None);
-            }
-            process::exit(1);
+        Commands::Doctor {
+            fail_on,
+            from,
+            agent,
+        } => {
+            run_doctor(&cli, &out, fail_on, from.as_ref(), *agent);
         }
         Commands::Report { format: _, out: _ } => {
             out.log("uenv report: not implemented yet");
@@ -40,6 +43,183 @@ fn main() {
         }
         Commands::Diff { a, b } => {
             run_diff(&out, a, b);
+        }
+    }
+}
+
+/// uenv doctor [--project .] [--json] [--fail-on none|warning|error] [--agent] [--from <json>]
+fn run_doctor(
+    cli: &Cli,
+    out: &Output,
+    fail_on: &str,
+    from: Option<&std::path::PathBuf>,
+    agent: bool,
+) {
+    let env = if let Some(path) = from {
+        match load_env(path, out) {
+            Some(e) => e,
+            None => process::exit(1),
+        }
+    } else {
+        let (env, _count, _elapsed) = run_scan_env(cli, out);
+        env
+    };
+
+    // 匹配的 adapter（项目类型识别）
+    let mut relevant: std::collections::BTreeSet<&'static str> = std::collections::BTreeSet::new();
+    for adapter in uenv_adapters::all_adapters() {
+        if adapter.matches(&env) {
+            for d in adapter.meta().relevant_detectors {
+                relevant.insert(d);
+            }
+        }
+    }
+
+    // 跑规则：relevant 非空时只跑相关规则，不相关标记 skipped；relevant 空（非项目）全跑
+    let mut findings: Vec<Finding> = Vec::new();
+    let mut skipped: Vec<&'static str> = Vec::new();
+
+    for rule in uenv_rules::all_rules() {
+        let rule_rel = rule.relevant_detectors();
+        let related = if relevant.is_empty() {
+            true // 无项目类型匹配 → 全跑（如只扫机器不扫项目）
+        } else {
+            rule_rel.is_empty() || rule_rel.iter().any(|d| relevant.contains(d))
+        };
+        if !related {
+            skipped.push(rule.id());
+            continue;
+        }
+        findings.extend(rule.evaluate(&env));
+    }
+
+    // 统计
+    let error_n = findings
+        .iter()
+        .filter(|f| f.severity == Severity::Error)
+        .count();
+    let warning_n = findings
+        .iter()
+        .filter(|f| f.severity == Severity::Warning)
+        .count();
+    let info_n = findings
+        .iter()
+        .filter(|f| f.severity == Severity::Info)
+        .count();
+
+    // agent 模式：精简输出，去掉 evidence 正文（保留 source）
+    let json_mode = out.json_mode || agent;
+    if json_mode {
+        let payload = serde_json::json!({
+            "findings": findings.iter().map(|f| finding_to_json(f, agent)).collect::<Vec<_>>(),
+            "skipped_rules": skipped,
+            "summary": { "error": error_n, "warning": warning_n, "info": info_n },
+        });
+        out.json(true, Some(&payload), None, None);
+    } else {
+        render_doctor_text(out, &findings, &skipped, error_n, warning_n, info_n);
+    }
+
+    // 退出码：默认 --fail-on error
+    let fail_level = match fail_on {
+        "none" => 0,
+        "warning" => {
+            if error_n > 0 || warning_n > 0 {
+                1
+            } else {
+                0
+            }
+        }
+        _ => {
+            if error_n > 0 {
+                1
+            } else {
+                0
+            }
+        }
+    };
+    if fail_level == 1 {
+        process::exit(1);
+    }
+}
+
+fn finding_to_json(f: &Finding, agent: bool) -> serde_json::Value {
+    let fix = f.suggested_fix.as_ref().map(|s| {
+        serde_json::json!({
+            "safety": format!("{:?}", s.safety).to_lowercase(),
+            "explain": s.explain,
+            "commands": s.commands,
+            "rollback": s.rollback,
+        })
+    });
+    serde_json::json!({
+        "rule_id": f.rule_id,
+        "severity": format!("{:?}", f.severity).to_lowercase(),
+        "title": f.title,
+        "description": f.description,
+        // agent 模式去掉 evidence 正文，保留 source
+        "evidence_sources": if agent {
+            serde_json::Value::Array(
+                f.evidence.iter().map(|e| serde_json::json!({"source": e.source})).collect(),
+            )
+        } else {
+            serde_json::Value::Array(
+                f.evidence.iter().map(|e| serde_json::json!({
+                    "kind": format!("{:?}", e.kind).to_lowercase(),
+                    "source": e.source,
+                    "excerpt": e.excerpt,
+                })).collect(),
+            )
+        },
+        "suggested_fix": fix,
+    })
+}
+
+fn render_doctor_text(
+    out: &Output,
+    findings: &[Finding],
+    skipped: &[&'static str],
+    error_n: usize,
+    warning_n: usize,
+    info_n: usize,
+) {
+    if error_n > 0 {
+        out.text(&format!("\n[Error] {error_n} 条："));
+        for f in findings.iter().filter(|f| f.severity == Severity::Error) {
+            render_finding_text(out, f);
+        }
+    }
+    if warning_n > 0 {
+        out.text(&format!("\n[Warning] {warning_n} 条："));
+        for f in findings.iter().filter(|f| f.severity == Severity::Warning) {
+            render_finding_text(out, f);
+        }
+    }
+    if info_n > 0 {
+        out.text(&format!("\n[Info] {info_n} 条："));
+        for f in findings.iter().filter(|f| f.severity == Severity::Info) {
+            render_finding_text(out, f);
+        }
+    }
+    if !skipped.is_empty() {
+        out.text(&format!(
+            "\n[skipped] {} 条规则未运行：{}",
+            skipped.len(),
+            skipped.join(", ")
+        ));
+    }
+    out.text(&format!(
+        "\n总结：{error_n} error / {warning_n} warning / {info_n} info"
+    ));
+}
+
+fn render_finding_text(out: &Output, f: &Finding) {
+    out.text(&format!("  [{}({:?})] {}", f.rule_id, f.severity, f.title));
+    out.text(&format!("    现象/原因：{}", f.description));
+    if let Some(fix) = &f.suggested_fix {
+        out.text(&format!("    建议（{:?}）：{}", fix.safety, fix.explain));
+        for c in &fix.commands {
+            out.text(&format!("      $ {c}"));
         }
     }
 }

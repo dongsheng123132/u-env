@@ -16,6 +16,7 @@ chrono.workspace = true
 uenv-core = { path = "../uenv-core" }
 uenv-scanner = { path = "../uenv-scanner" }
 uenv-rules = { path = "../uenv-rules" }
+uenv-adapters = { path = "../../adapters/uenv-adapters" }
 uenv-fingerprint = { path = "../uenv-fingerprint" }
 uenv-report = { path = "../uenv-report" }
 

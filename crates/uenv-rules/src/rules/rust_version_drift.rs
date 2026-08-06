@@ -4,8 +4,8 @@
 #[allow(unused_imports)]
 use uenv_core::{Environment, Finding, Severity};
 
-use crate::helpers::{drift_satisfies_false, finding};
 use crate::Rule;
+use crate::helpers::{drift_satisfies_false, finding};
 
 pub struct RustVersionDrift;
 
@@ -52,8 +52,12 @@ mod tests {
                 ("satisfied".to_string(), val),
             ])),
         )]));
-        crate::test_utils::with_detector(&mut env, "project.drift", Layer::Project,
-            BTreeMap::from([("drift".to_string(), drift)]));
+        crate::test_utils::with_detector(
+            &mut env,
+            "project.drift",
+            Layer::Project,
+            BTreeMap::from([("drift".to_string(), drift)]),
+        );
         env
     }
 
@@ -67,6 +71,11 @@ mod tests {
     #[test]
     fn silent_when_satisfied() {
         assert_eq!(RustVersionDrift.evaluate(&env_with_drift("true")).len(), 0);
-        assert_eq!(RustVersionDrift.evaluate(&crate::test_utils::empty_env()).len(), 0);
+        assert_eq!(
+            RustVersionDrift
+                .evaluate(&crate::test_utils::empty_env())
+                .len(),
+            0
+        );
     }
 }
