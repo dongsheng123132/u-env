@@ -30,13 +30,7 @@ pub fn validate(value: &Value, schema: &Value) -> Result<(), Vec<ValidateError>>
     }
 }
 
-fn walk(
-    value: &Value,
-    schema: &Value,
-    defs: &Value,
-    path: &str,
-    errors: &mut Vec<ValidateError>,
-) {
+fn walk(value: &Value, schema: &Value, defs: &Value, path: &str, errors: &mut Vec<ValidateError>) {
     if let Some(ref_s) = schema.get("$ref") {
         if let Some(rs) = ref_s.as_str() {
             if let Some(stripped) = rs.strip_prefix("#/$defs/") {
@@ -58,7 +52,10 @@ fn walk(
             }
         }
         if !ok {
-            errors.push(ValidateError { path: path.to_string(), msg: "不匹配任何 oneOf 分支".to_string() });
+            errors.push(ValidateError {
+                path: path.to_string(),
+                msg: "不匹配任何 oneOf 分支".to_string(),
+            });
         }
         return;
     }
@@ -66,13 +63,22 @@ fn walk(
         match t {
             Value::String(ts) => {
                 if !type_matches(value, ts) {
-                    errors.push(ValidateError { path: path.to_string(), msg: format!("期望 {ts}，实际 {}", type_name(value)) });
+                    errors.push(ValidateError {
+                        path: path.to_string(),
+                        msg: format!("期望 {ts}，实际 {}", type_name(value)),
+                    });
                     return;
                 }
             }
             Value::Array(ts) => {
-                if !ts.iter().any(|x| x.as_str().is_some_and(|s| type_matches(value, s))) {
-                    errors.push(ValidateError { path: path.to_string(), msg: "类型不符".to_string() });
+                if !ts
+                    .iter()
+                    .any(|x| x.as_str().is_some_and(|s| type_matches(value, s)))
+                {
+                    errors.push(ValidateError {
+                        path: path.to_string(),
+                        msg: "类型不符".to_string(),
+                    });
                     return;
                 }
             }
@@ -84,24 +90,34 @@ fn walk(
         if let Some(s) = value.as_str() {
             let ok = match pat.as_str() {
                 "^origin-env:sha256:[0-9a-f]{64}$" => {
-                    s.len() == 7 + 64 && s.starts_with("origin-env:sha256:")
+                    s.len() == 7 + 64
+                        && s.starts_with("origin-env:sha256:")
                         && s[7..].chars().all(|c| c.is_ascii_hexdigit())
                 }
                 _ => true, // 未知 pattern 不校验
             };
             if !ok {
-                errors.push(ValidateError { path: path.to_string(), msg: format!("pattern 不匹配: {pat}") });
+                errors.push(ValidateError {
+                    path: path.to_string(),
+                    msg: format!("pattern 不匹配: {pat}"),
+                });
             }
         }
     }
     if let Some(Value::String(con)) = schema.get("const") {
         if value.as_str() != Some(con) {
-            errors.push(ValidateError { path: path.to_string(), msg: format!("const 不匹配: 期望 {con}") });
+            errors.push(ValidateError {
+                path: path.to_string(),
+                msg: format!("const 不匹配: 期望 {con}"),
+            });
         }
     }
     if let Some(Value::Array(enumv)) = schema.get("enum") {
         if !enumv.iter().any(|e| e == value) {
-            errors.push(ValidateError { path: path.to_string(), msg: format!("不在 enum 内: {value}") });
+            errors.push(ValidateError {
+                path: path.to_string(),
+                msg: format!("不在 enum 内: {value}"),
+            });
         }
     }
     if let Some(Value::Array(required)) = schema.get("required") {
@@ -109,12 +125,18 @@ fn walk(
             for r in required {
                 if let Some(name) = r.as_str() {
                     if !map.contains_key(name) {
-                        errors.push(ValidateError { path: path.to_string(), msg: format!("缺少必填字段 {name}") });
+                        errors.push(ValidateError {
+                            path: path.to_string(),
+                            msg: format!("缺少必填字段 {name}"),
+                        });
                     }
                 }
             }
         } else {
-            errors.push(ValidateError { path: path.to_string(), msg: "期望 object 但实际不是".to_string() });
+            errors.push(ValidateError {
+                path: path.to_string(),
+                msg: "期望 object 但实际不是".to_string(),
+            });
             return;
         }
     }
@@ -179,7 +201,10 @@ mod tests {
     use super::*;
 
     fn load_schema() -> Value {
-        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../schemas/environment.schema.json");
+        let path = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../schemas/environment.schema.json"
+        );
         serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap()
     }
 

@@ -134,7 +134,8 @@ fn build_schema() -> serde_json::Value {
 fn main() {
     let schema = build_schema();
     let json = serde_json::to_string_pretty(&schema).expect("schema serialization");
-    let out_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../schemas/environment.schema.json");
+    let out_path =
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../schemas/environment.schema.json");
     fs::create_dir_all(out_path.parent().unwrap()).expect("create schemas dir");
     fs::write(&out_path, json).expect("write schema");
     println!("schema written to {}", out_path.display());

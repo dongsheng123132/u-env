@@ -18,9 +18,11 @@ pub fn render_markdown(
     // 一句话结论
     let error_n = count_sev(findings, Severity::Error);
     let warning_n = count_sev(findings, Severity::Warning);
-    let info_n = count_sev(findings, Severity::Info);
+    let _info_n = count_sev(findings, Severity::Info);
     let conclusion = if error_n > 0 {
-        format!("**发现 {error_n} 个 Error 级问题**——这台机器的环境无法满足项目要求，先解决下面的 Error 再继续。")
+        format!(
+            "**发现 {error_n} 个 Error 级问题**——这台机器的环境无法满足项目要求，先解决下面的 Error 再继续。"
+        )
     } else if warning_n > 0 {
         format!("环境基本可用，但有 {warning_n} 个 Warning 值得处理。")
     } else {
@@ -32,7 +34,10 @@ pub fn render_markdown(
     out.push_str("## 环境概览\n\n");
     out.push_str("| 项 | 值 |\n|---|---|\n");
     let os = &env.identity.os;
-    out.push_str(&format!("| 系统 | {} build {} |\n", os.product_name, os.build));
+    out.push_str(&format!(
+        "| 系统 | {} build {} |\n",
+        os.product_name, os.build
+    ));
     out.push_str(&format!("| 架构 | {:?} |\n", env.identity.architecture));
     if let Some(p) = &env.identity.project {
         out.push_str(&format!("| 项目根 | `{}` |\n", p.root));
@@ -45,7 +50,11 @@ pub fn render_markdown(
     if findings.is_empty() {
         out.push_str("未发现问题。\n\n");
     }
-    for (label, sev) in [("### Error", Severity::Error), ("### Warning", Severity::Warning), ("### Info", Severity::Info)] {
+    for (label, sev) in [
+        ("### Error", Severity::Error),
+        ("### Warning", Severity::Warning),
+        ("### Info", Severity::Info),
+    ] {
         let items: Vec<&Finding> = findings.iter().filter(|f| f.severity == sev).collect();
         if items.is_empty() {
             continue;
@@ -55,7 +64,10 @@ pub fn render_markdown(
             out.push_str(&format!("#### `{}` — {}\n\n", f.rule_id, f.title));
             out.push_str(&format!("{}. \n\n", f.description));
             if let Some(fix) = &f.suggested_fix {
-                out.push_str(&format!("**建议**（{:?}）：{}\n\n", fix.safety, fix.explain));
+                out.push_str(&format!(
+                    "**建议**（{:?}）：{}\n\n",
+                    fix.safety, fix.explain
+                ));
                 if !fix.commands.is_empty() {
                     out.push_str("```bash\n");
                     for c in &fix.commands {
@@ -79,7 +91,12 @@ pub fn render_markdown(
                     } else {
                         e.excerpt.clone()
                     };
-                    out.push_str(&format!("- `{}`（{}）：`{}`\n", e.source, format!("{:?}", e.kind).to_lowercase(), excerpt));
+                    out.push_str(&format!(
+                        "- `{}`（{}）：`{}`\n",
+                        e.source,
+                        format!("{:?}", e.kind).to_lowercase(),
+                        excerpt
+                    ));
                 }
                 out.push_str("\n</details>\n\n");
             }
@@ -92,7 +109,7 @@ pub fn render_markdown(
         out.push_str(&format!("- host: `{}`\n", fp.host));
         out.push_str(&format!("- toolchain: `{}`\n", fp.toolchain));
         if let Some(p) = &fp.project {
-            out.push_str(&format!("- project: `{}`\n", p));
+            out.push_str(&format!("- project: `{p}`\n"));
         }
         out.push_str(&format!("- full: `{}`\n", fp.full));
     } else {
@@ -102,7 +119,11 @@ pub fn render_markdown(
 
     // skipped 规则
     if !skipped_rules.is_empty() {
-        out.push_str(&format!("> 本次跳过 {} 条不相关规则：{}。\n\n", skipped_rules.len(), skipped_rules.join(", ")));
+        out.push_str(&format!(
+            "> 本次跳过 {} 条不相关规则：{}。\n\n",
+            skipped_rules.len(),
+            skipped_rules.join(", ")
+        ));
     }
 
     // 附录：全部 detector summary
@@ -110,7 +131,10 @@ pub fn render_markdown(
     out.push_str("| detector | 状态 | summary |\n|---|---|---|\n");
     for (id, record) in &env.detectors {
         let status = format!("{:?}", record.status).to_lowercase();
-        out.push_str(&format!("| `{id}` | {status} | {} |\n", record.summary.replace('|', "\\|")));
+        out.push_str(&format!(
+            "| `{id}` | {status} | {} |\n",
+            record.summary.replace('|', "\\|")
+        ));
     }
     out.push('\n');
 
@@ -130,12 +154,14 @@ pub fn render_json(
     let findings_json: Vec<serde_json::Value> = findings
         .iter()
         .map(|f| {
-            let fix = f.suggested_fix.as_ref().map(|s| serde_json::json!({
-                "safety": format!("{:?}", s.safety).to_lowercase(),
-                "explain": s.explain,
-                "commands": s.commands,
-                "rollback": s.rollback,
-            }));
+            let fix = f.suggested_fix.as_ref().map(|s| {
+                serde_json::json!({
+                    "safety": format!("{:?}", s.safety).to_lowercase(),
+                    "explain": s.explain,
+                    "commands": s.commands,
+                    "rollback": s.rollback,
+                })
+            });
             serde_json::json!({
                 "rule_id": f.rule_id,
                 "severity": format!("{:?}", f.severity).to_lowercase(),
