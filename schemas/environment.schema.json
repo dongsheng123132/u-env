@@ -1,0 +1,390 @@
+{
+  "$defs": {
+    "detector_record": {
+      "properties": {
+        "elapsed_ms": {
+          "type": "integer"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/evidence"
+          },
+          "type": "array"
+        },
+        "facts": {
+          "additionalProperties": {
+            "$ref": "#/$defs/fact_value"
+          },
+          "type": "object"
+        },
+        "id": {
+          "type": "string"
+        },
+        "layer": {
+          "enum": [
+            "host",
+            "toolchain",
+            "project"
+          ]
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "absent",
+            "degraded",
+            "error",
+            "skipped"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "volatile": {
+          "additionalProperties": {
+            "$ref": "#/$defs/fact_value"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "layer",
+        "title",
+        "status",
+        "summary",
+        "facts"
+      ],
+      "type": "object"
+    },
+    "environment_fingerprint": {
+      "properties": {
+        "full": {
+          "pattern": "^origin-env:sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "host": {
+          "pattern": "^origin-env:sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "project": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "toolchain": {
+          "pattern": "^origin-env:sha256:[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "host",
+        "toolchain",
+        "full"
+      ],
+      "type": "object"
+    },
+    "evidence": {
+      "properties": {
+        "excerpt": {
+          "type": "string"
+        },
+        "exit_code": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "command",
+            "registry",
+            "file",
+            "env"
+          ]
+        },
+        "source": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "source",
+        "excerpt"
+      ],
+      "type": "object"
+    },
+    "fact_value": {
+      "description": "有限值类型，带类型标记（与 serde 派生 snake_case 一致）",
+      "oneOf": [
+        {
+          "properties": {
+            "str": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "str"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "int": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "int"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "bool": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "bool"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "version": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "version"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "list": {
+              "items": {
+                "$ref": "#/$defs/fact_value"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "list"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "set": {
+              "items": {
+                "$ref": "#/$defs/fact_value"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "set"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "map": {
+              "additionalProperties": {
+                "$ref": "#/$defs/fact_value"
+              },
+              "type": "object"
+            }
+          },
+          "required": [
+            "map"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "operating_system": {
+      "properties": {
+        "build": {
+          "type": "integer"
+        },
+        "display_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "edition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "family": {
+          "type": "string"
+        },
+        "product_name": {
+          "type": "string"
+        },
+        "product_name_raw": {
+          "type": "string"
+        },
+        "ubr": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "family",
+        "product_name",
+        "product_name_raw",
+        "version",
+        "build"
+      ],
+      "type": "object"
+    },
+    "project_manifest": {
+      "properties": {
+        "declared_toolchains": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "git": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "kind": {
+          "items": {
+            "enum": [
+              "tauri",
+              "electron",
+              "node",
+              "rust",
+              "dotnet",
+              "winui",
+              "python",
+              "unknown"
+            ]
+          },
+          "type": "array"
+        },
+        "lockfiles": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "root": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "root",
+        "kind"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://u-king.org/schemas/environment.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "本境协议 (Origin Environment Protocol) v0.1 环境对象。由 uenv scan 产出。",
+  "properties": {
+    "detectors": {
+      "additionalProperties": {
+        "$ref": "#/$defs/detector_record"
+      },
+      "description": "key = detector id",
+      "type": "object"
+    },
+    "fingerprint": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/environment_fingerprint"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "generated_at": {
+      "description": "RFC3339 时间戳，不进指纹",
+      "type": "string"
+    },
+    "identity": {
+      "properties": {
+        "architecture": {
+          "enum": [
+            "x64",
+            "arm64",
+            "x86",
+            "unknown"
+          ]
+        },
+        "host_alias": {
+          "type": "string"
+        },
+        "os": {
+          "$ref": "#/$defs/operating_system"
+        },
+        "project": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/project_manifest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "host_alias",
+        "os",
+        "architecture"
+      ],
+      "type": "object"
+    },
+    "spec": {
+      "const": "origin-environment/v0.1",
+      "description": "协议版本标记，diff/load 时校验",
+      "type": "string"
+    },
+    "uenv_version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "spec",
+    "generated_at",
+    "uenv_version",
+    "identity",
+    "detectors"
+  ],
+  "title": "Origin Environment",
+  "type": "object"
+}

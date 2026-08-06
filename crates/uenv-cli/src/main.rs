@@ -31,12 +31,8 @@ fn main() {
         } => {
             run_doctor(&cli, &out, fail_on, from.as_ref(), *agent);
         }
-        Commands::Report { format: _, out: _ } => {
-            out.log("uenv report: not implemented yet");
-            if cli.json {
-                out.json(false, None::<()>, Some("not implemented yet".into()), None);
-            }
-            process::exit(1);
+        Commands::Report { format, out: report_out } => {
+            run_report(&cli, &out, format, report_out.as_ref());
         }
         Commands::Fingerprint { from } => {
             run_fingerprint(&cli, &out, from.as_ref());
@@ -221,6 +217,67 @@ fn render_finding_text(out: &Output, f: &Finding) {
         for c in &fix.commands {
             out.text(&format!("      $ {c}"));
         }
+    }
+}
+
+/// uenv report --format markdown|json [--out <path>] [--project .]
+fn run_report(cli: &Cli, out: &Output, format: &str, out_path: Option<&std::path::PathBuf>) {
+    // 现场 scan → 跑规则 → 渲染
+    let (mut env, _count, _elapsed) = run_scan_env(cli, out);
+
+    // 算指纹（报告含指纹一节）
+    if let Ok((fp, excluded)) = uenv_fingerprint::compute_fingerprint(&env) {
+        if !excluded.is_empty() {
+            out.log(&format!("⚠️ 指纹缺少 {} 个 detector：{}", excluded.len(), excluded.join(", ")));
+        }
+        env.fingerprint = Some(fp);
+    }
+
+    // 跑规则（复用 doctor 的 adapter 过滤逻辑）
+    let mut relevant: std::collections::BTreeSet<&'static str> = std::collections::BTreeSet::new();
+    for adapter in uenv_adapters::all_adapters() {
+        if adapter.matches(&env) {
+            for d in adapter.meta().relevant_detectors {
+                relevant.insert(d);
+            }
+        }
+    }
+    let mut findings: Vec<Finding> = Vec::new();
+    let mut skipped: Vec<&'static str> = Vec::new();
+    for rule in uenv_rules::all_rules() {
+        let rule_rel = rule.relevant_detectors();
+        let related = if relevant.is_empty() {
+            true
+        } else {
+            rule_rel.is_empty() || rule_rel.iter().any(|d| relevant.contains(d))
+        };
+        if !related {
+            skipped.push(rule.id());
+            continue;
+        }
+        findings.extend(rule.evaluate(&env));
+    }
+
+    let rendered = match format {
+        "json" => uenv_report::render_json(&env, &findings, &skipped),
+        _ => uenv_report::render_markdown(&env, &findings, &skipped),
+    };
+    let rendered = match rendered {
+        Ok(r) => r,
+        Err(e) => {
+            out.log(&format!("render error: {e}"));
+            process::exit(1);
+        }
+    };
+
+    if let Some(path) = out_path {
+        if let Err(e) = std::fs::write(path, &rendered) {
+            out.log(&format!("failed to write {}: {e}", path.display()));
+            process::exit(1);
+        }
+        out.log(&format!("report written to {}", path.display()));
+    } else {
+        out.text(&rendered);
     }
 }
 
@@ -467,7 +524,7 @@ fn run_scan_env(cli: &Cli, out: &Output) -> (Environment, usize, u64) {
     let total_elapsed = start.elapsed().as_millis() as u64;
 
     // 构建环境对象
-    let env = Environment {
+    let mut env = Environment {
         spec: "origin-environment/v0.1".to_string(),
         generated_at: chrono::Utc::now().to_rfc3339(),
         uenv_version: env!("CARGO_PKG_VERSION").to_string(),
@@ -489,6 +546,53 @@ fn run_scan_env(cli: &Cli, out: &Output) -> (Environment, usize, u64) {
         detectors: records,
         fingerprint: None,
     };
+
+    // 用 windows.version detector 的 facts 回填 identity.os（T0 遗留：恒为 Unknown）
+    if let Some(rec) = env.detectors.get("windows.version") {
+        if rec.status == DetectStatus::Ok {
+            let get_str = |k: &str| match rec.facts.get(k) {
+                Some(uenv_core::FactValue::Str(s)) => Some(s.clone()),
+                _ => None,
+            };
+            let get_int = |k: &str| match rec.facts.get(k) {
+                Some(uenv_core::FactValue::Int(i)) => Some(*i as u32),
+                _ => None,
+            };
+            let os = &mut env.identity.os;
+            if let Some(p) = get_str("product_name") {
+                os.product_name = p;
+            }
+            if let Some(p) = get_str("product_name_raw") {
+                os.product_name_raw = p;
+            }
+            if let Some(v) = get_str("version") {
+                os.version = v;
+            }
+            if let Some(b) = get_int("build") {
+                os.build = b;
+            }
+            if let Some(u) = get_int("ubr") {
+                os.ubr = Some(u);
+            }
+            if let Some(e) = get_str("edition") {
+                os.edition = Some(e);
+            }
+            if let Some(d) = get_str("display_version") {
+                os.display_version = Some(d);
+            }
+        }
+    }
+    // 架构（x64 等）也回填
+    if let Some(rec) = env.detectors.get("windows.version") {
+        if let Some(uenv_core::FactValue::Str(a)) = rec.facts.get("architecture") {
+            env.identity.architecture = match a.as_str() {
+                "arm64" => uenv_core::Architecture::Arm64,
+                "x86" => uenv_core::Architecture::X86,
+                "x64" => uenv_core::Architecture::X64,
+                _ => uenv_core::Architecture::Unknown,
+            };
+        }
+    }
 
     out.log(&format!(
         "scan complete: {count} detectors in {total_elapsed}ms"
