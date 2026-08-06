@@ -486,6 +486,7 @@ dependencies = [
  "clap",
  "serde",
  "serde_json",
+ "uenv-adapters",
  "uenv-core",
  "uenv-fingerprint",
  "uenv-report",
