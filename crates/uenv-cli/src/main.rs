@@ -1,5 +1,6 @@
 mod cli;
 mod output;
+mod stub;
 
 use std::collections::BTreeMap;
 use std::process;
@@ -42,6 +43,9 @@ fn main() {
         }
         Commands::Diff { a, b } => {
             run_diff(&out, a, b);
+        }
+        Commands::Stub { out: stub_out } => {
+            run_stub(&out, stub_out.as_ref());
         }
     }
 }
@@ -406,6 +410,31 @@ fn run_diff(out: &Output, a: &std::path::PathBuf, b: &std::path::PathBuf) {
         );
     } else {
         out.text(&uenv_fingerprint::render_text(&high, &low, &only));
+    }
+}
+
+/// uenv stub [--out <path>] [--json]
+/// 输出/写入 agent 发现 stub（版本在编译期钉住）。
+fn run_stub(out: &Output, out_path: Option<&std::path::PathBuf>) {
+    let text = stub::stub_text();
+
+    if out.json_mode {
+        let payload = serde_json::json!({
+            "stub": text,
+            "version": env!("CARGO_PKG_VERSION"),
+        });
+        out.json(true, Some(&payload), None, None);
+        return;
+    }
+
+    if let Some(path) = out_path {
+        if let Err(e) = std::fs::write(path, &text) {
+            out.log(&format!("failed to write {}: {e}", path.display()));
+            process::exit(1);
+        }
+        out.log(&format!("agent stub written to {}", path.display()));
+    } else {
+        out.text(&text);
     }
 }
 

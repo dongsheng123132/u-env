@@ -87,4 +87,11 @@ pub enum Commands {
         /// 比较快照
         b: PathBuf,
     },
+
+    /// 输出/写入 agent 发现 stub（给 AI 指路，只读安全）
+    Stub {
+        /// 输出文件路径（缺省 = 打印到 stdout）
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
 }

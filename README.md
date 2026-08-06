@@ -63,6 +63,18 @@ uenv report --format markdown --project . --out report.md
 uenv doctor --project . --agent
 ```
 
+### 让 agent 发现 uenv（Discovery stub）
+
+agent 落地陌生项目时不知道 `uenv doctor` 存在。把 stub 放进项目（或装到 agent 的全局配置），
+它就会在需要判断「这机器能不能跑」时自动调用 uenv：
+
+```bash
+uenv stub                        # 打印 stub（版本钉住，可直接给 agent 读）
+uenv stub --out .claude/uenv.md  # 写进项目
+```
+
+stub 只指路、不含实现细节，真值按需取、随 uenv 版本走。
+
 ## 支持矩阵
 
 | 框架 | 扫描 | 诊断 | 修复 | 故障舱 | 重现 |
