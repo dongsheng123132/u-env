@@ -6,6 +6,7 @@
 
 pub mod electron;
 pub mod node;
+pub mod rust;
 pub mod tauri;
 
 use uenv_core::{Environment, FactValue};
@@ -30,6 +31,7 @@ pub fn all_adapters() -> Vec<Box<dyn Adapter>> {
         Box::new(tauri::TauriAdapter),
         Box::new(electron::ElectronAdapter),
         Box::new(node::NodeAdapter),
+        Box::new(rust::RustAdapter),
     ]
 }
 
@@ -112,6 +114,7 @@ mod tests {
         assert!(tauri::TauriAdapter.matches(&env));
         assert!(!electron::ElectronAdapter.matches(&env));
         assert!(node::NodeAdapter.matches(&env));
+        assert!(rust::RustAdapter.matches(&env));
     }
 
     #[test]
@@ -119,14 +122,16 @@ mod tests {
         let env = fake_env(&["electron", "node"]);
         assert!(electron::ElectronAdapter.matches(&env));
         assert!(!tauri::TauriAdapter.matches(&env));
+        assert!(!rust::RustAdapter.matches(&env));
     }
 
     #[test]
-    fn no_adapter_matches_plain_rust() {
+    fn rust_adapter_matches_plain_rust() {
         let env = fake_env(&["rust"]);
         assert!(!tauri::TauriAdapter.matches(&env));
         assert!(!electron::ElectronAdapter.matches(&env));
         assert!(!node::NodeAdapter.matches(&env));
+        assert!(rust::RustAdapter.matches(&env));
     }
 
     #[test]
