@@ -1,0 +1,25 @@
+// 规则模块声明
+pub mod fs_project_on_network;
+pub mod fs_project_on_onedrive;
+pub mod fs_project_path_has_space;
+pub mod fs_project_path_non_ascii;
+pub mod git_autocrlf_true;
+pub mod git_longpaths_disabled;
+pub mod msvc_missing_buildtools;
+pub mod net_proxy_inconsistent;
+pub mod node_multiple_in_path;
+pub mod node_multiple_lockfiles;
+pub mod node_package_manager_mismatch;
+pub mod node_version_drift;
+pub mod path_duplicate_entries;
+pub mod path_missing_entries;
+pub mod python_store_alias_shadow;
+pub mod rust_gnu_toolchain_on_windows;
+pub mod rust_multiple_cargo_in_path;
+pub mod rust_version_drift;
+pub mod scan_detector_failed;
+pub mod security_defender_scans_project;
+pub mod webview2_missing;
+pub mod windows_developer_mode_disabled;
+pub mod windows_long_paths_disabled;
+pub mod winsdk_missing;
