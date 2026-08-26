@@ -84,51 +84,51 @@ impl Detector for ProjectManifests {
         // .nvmrc / .node-version
         for f in [".nvmrc", ".node-version"] {
             let p = root.join(f);
-            if p.is_file() {
-                if let Ok(content) = std::fs::read_to_string(&p) {
-                    let v = content.trim();
-                    if !v.is_empty() {
-                        declared.insert("node".to_string(), v.to_string());
-                    }
-                    evidence.push(Evidence {
-                        kind: EvidenceKind::File,
-                        source: f.to_string(),
-                        exit_code: None,
-                        excerpt: v.to_string(),
-                    });
+            if p.is_file()
+                && let Ok(content) = std::fs::read_to_string(&p)
+            {
+                let v = content.trim();
+                if !v.is_empty() {
+                    declared.insert("node".to_string(), v.to_string());
                 }
+                evidence.push(Evidence {
+                    kind: EvidenceKind::File,
+                    source: f.to_string(),
+                    exit_code: None,
+                    excerpt: v.to_string(),
+                });
             }
         }
 
         // rust-toolchain.toml / rust-toolchain
         for f in ["rust-toolchain.toml", "rust-toolchain"] {
             let p = root.join(f);
-            if p.is_file() {
-                if let Ok(content) = std::fs::read_to_string(&p) {
-                    // channel = "1.88" 或 "stable"
-                    let mut ch: Option<String> = None;
-                    for line in content.lines() {
-                        let t = line.trim();
-                        if let Some(rest) = t.strip_prefix("channel") {
-                            if let Some(eq) = rest.find('=') {
-                                let v = rest[eq + 1..].trim().trim_matches('"');
-                                if !v.is_empty() {
-                                    ch = Some(v.to_string());
-                                    break;
-                                }
-                            }
+            if p.is_file()
+                && let Ok(content) = std::fs::read_to_string(&p)
+            {
+                // channel = "1.88" 或 "stable"
+                let mut ch: Option<String> = None;
+                for line in content.lines() {
+                    let t = line.trim();
+                    if let Some(rest) = t.strip_prefix("channel")
+                        && let Some(eq) = rest.find('=')
+                    {
+                        let v = rest[eq + 1..].trim().trim_matches('"');
+                        if !v.is_empty() {
+                            ch = Some(v.to_string());
+                            break;
                         }
                     }
-                    if let Some(c) = ch {
-                        declared.insert("rust".to_string(), c);
-                    }
-                    evidence.push(Evidence {
-                        kind: EvidenceKind::File,
-                        source: f.to_string(),
-                        exit_code: None,
-                        excerpt: truncate(&content, 500),
-                    });
                 }
+                if let Some(c) = ch {
+                    declared.insert("rust".to_string(), c);
+                }
+                evidence.push(Evidence {
+                    kind: EvidenceKind::File,
+                    source: f.to_string(),
+                    exit_code: None,
+                    excerpt: truncate(&content, 500),
+                });
             }
         }
 
@@ -179,20 +179,20 @@ pub fn parse_package_json(content: &str) -> (BTreeMap<String, String>, Option<St
     // engines: {"node": ">=22", "npm": ">=10"}
     if let Some(engines) = v.get("engines").and_then(|e| e.as_object()) {
         for (k, val) in engines {
-            if let Some(s) = val.as_str() {
-                if !s.is_empty() {
-                    declared.insert(k.clone(), s.to_string());
-                }
+            if let Some(s) = val.as_str()
+                && !s.is_empty()
+            {
+                declared.insert(k.clone(), s.to_string());
             }
         }
     }
 
     // packageManager: "pnpm@9.12.0"
-    if let Some(p) = v.get("packageManager").and_then(|p| p.as_str()) {
-        if !p.is_empty() {
-            let name = p.split('@').next().unwrap_or(p).to_string();
-            pm = Some(name);
-        }
+    if let Some(p) = v.get("packageManager").and_then(|p| p.as_str())
+        && !p.is_empty()
+    {
+        let name = p.split('@').next().unwrap_or(p).to_string();
+        pm = Some(name);
     }
 
     (declared, pm)
@@ -209,14 +209,13 @@ pub fn parse_cargo_toml(content: &str) -> Option<String> {
             in_target = section == "package" || section == "workspace.package";
             continue;
         }
-        if in_target {
-            if let Some(rest) = t.strip_prefix("rust-version") {
-                if let Some(eq) = rest.find('=') {
-                    let v = rest[eq + 1..].trim().trim_matches('"').to_string();
-                    if !v.is_empty() {
-                        return Some(v);
-                    }
-                }
+        if in_target
+            && let Some(rest) = t.strip_prefix("rust-version")
+            && let Some(eq) = rest.find('=')
+        {
+            let v = rest[eq + 1..].trim().trim_matches('"').to_string();
+            if !v.is_empty() {
+                return Some(v);
             }
         }
     }

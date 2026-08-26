@@ -104,10 +104,10 @@ pub fn parse_hardware(json: &str) -> BTreeMap<String, FactValue> {
         _ => return facts,
     };
 
-    if let Some(name) = obj.get("cpu_name").and_then(|n| n.as_str()) {
-        if !name.is_empty() {
-            facts.insert("cpu_model".to_string(), FactValue::Str(name.to_string()));
-        }
+    if let Some(name) = obj.get("cpu_name").and_then(|n| n.as_str())
+        && !name.is_empty()
+    {
+        facts.insert("cpu_model".to_string(), FactValue::Str(name.to_string()));
     }
     if let Some(cores) = obj.get("cores").and_then(|c| c.as_u64()) {
         facts.insert("cpu_cores".to_string(), FactValue::Int(cores as i64));

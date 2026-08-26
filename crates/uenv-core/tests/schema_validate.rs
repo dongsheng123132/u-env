@@ -68,17 +68,16 @@ fn walk(value: &Value, schema: &Value, defs: &Value, path: &str, errors: &mut Ve
                     return;
                 }
             }
-            Value::Array(ts) => {
+            Value::Array(ts)
                 if !ts
                     .iter()
-                    .any(|x| x.as_str().is_some_and(|s| type_matches(value, s)))
-                {
-                    errors.push(ValidateError {
-                        path: path.to_string(),
-                        msg: "类型不符".to_string(),
-                    });
-                    return;
-                }
+                    .any(|x| x.as_str().is_some_and(|s| type_matches(value, s))) =>
+            {
+                errors.push(ValidateError {
+                    path: path.to_string(),
+                    msg: "类型不符".to_string(),
+                });
+                return;
             }
             _ => {}
         }
@@ -102,32 +101,32 @@ fn walk(value: &Value, schema: &Value, defs: &Value, path: &str, errors: &mut Ve
             }
         }
     }
-    if let Some(Value::String(con)) = schema.get("const") {
-        if value.as_str() != Some(con) {
-            errors.push(ValidateError {
-                path: path.to_string(),
-                msg: format!("const 不匹配: 期望 {con}"),
-            });
-        }
+    if let Some(Value::String(con)) = schema.get("const")
+        && value.as_str() != Some(con)
+    {
+        errors.push(ValidateError {
+            path: path.to_string(),
+            msg: format!("const 不匹配: 期望 {con}"),
+        });
     }
-    if let Some(Value::Array(enumv)) = schema.get("enum") {
-        if !enumv.iter().any(|e| e == value) {
-            errors.push(ValidateError {
-                path: path.to_string(),
-                msg: format!("不在 enum 内: {value}"),
-            });
-        }
+    if let Some(Value::Array(enumv)) = schema.get("enum")
+        && !enumv.iter().any(|e| e == value)
+    {
+        errors.push(ValidateError {
+            path: path.to_string(),
+            msg: format!("不在 enum 内: {value}"),
+        });
     }
     if let Some(Value::Array(required)) = schema.get("required") {
         if let Value::Object(map) = value {
             for r in required {
-                if let Some(name) = r.as_str() {
-                    if !map.contains_key(name) {
-                        errors.push(ValidateError {
-                            path: path.to_string(),
-                            msg: format!("缺少必填字段 {name}"),
-                        });
-                    }
+                if let Some(name) = r.as_str()
+                    && !map.contains_key(name)
+                {
+                    errors.push(ValidateError {
+                        path: path.to_string(),
+                        msg: format!("缺少必填字段 {name}"),
+                    });
                 }
             }
         } else {
@@ -138,12 +137,12 @@ fn walk(value: &Value, schema: &Value, defs: &Value, path: &str, errors: &mut Ve
             return;
         }
     }
-    if let Some(Value::Object(properties)) = schema.get("properties") {
-        if let Value::Object(map) = value {
-            for (k, subschema) in properties {
-                if let Some(sub) = map.get(k) {
-                    walk(sub, subschema, defs, &format!("{path}.{k}"), errors);
-                }
+    if let Some(Value::Object(properties)) = schema.get("properties")
+        && let Value::Object(map) = value
+    {
+        for (k, subschema) in properties {
+            if let Some(sub) = map.get(k) {
+                walk(sub, subschema, defs, &format!("{path}.{k}"), errors);
             }
         }
     }

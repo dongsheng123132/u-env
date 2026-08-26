@@ -113,10 +113,9 @@ pub fn parse_git_config(out: &str, version: &str) -> BTreeMap<String, FactValue>
             "core.autocrlf" => autocrlf = Some(value.to_string()),
             "core.longpaths" => longpaths = Some(value.to_string()),
             "core.symlinks" => symlinks = Some(value.to_string()),
-            "safe.directory" => {
-                if !value.is_empty() {
-                    safe_dirs.push(FactValue::Path(value.to_string()));
-                }
+            "safe.directory" if !value.is_empty() => {
+                // （此处若被 1.98 collapsible_if 标记，需看外层结构）
+                safe_dirs.push(FactValue::Path(value.to_string()));
             }
             _ => {}
         }

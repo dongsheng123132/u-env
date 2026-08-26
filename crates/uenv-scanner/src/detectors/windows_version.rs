@@ -86,10 +86,10 @@ impl Detector for WindowsVersion {
 
         facts.insert("build".to_string(), FactValue::Int(build as i64));
 
-        if let Some(ref u) = ubr {
-            if let Ok(n) = u.value.parse::<u32>() {
-                facts.insert("ubr".to_string(), FactValue::Int(n as i64));
-            }
+        if let Some(ref u) = ubr
+            && let Ok(n) = u.value.parse::<u32>()
+        {
+            facts.insert("ubr".to_string(), FactValue::Int(n as i64));
         }
 
         if let Some(ref e) = edition_id {
@@ -193,15 +193,15 @@ pub fn parse_windows_version(
     if let Some(u) = ubr {
         facts.insert("ubr".to_string(), FactValue::Int(u as i64));
     }
-    if let Some(e) = edition {
-        if !e.is_empty() {
-            facts.insert("edition".to_string(), FactValue::Str(e.to_string()));
-        }
+    if let Some(e) = edition
+        && !e.is_empty()
+    {
+        facts.insert("edition".to_string(), FactValue::Str(e.to_string()));
     }
-    if let Some(d) = display_version {
-        if !d.is_empty() {
-            facts.insert("display_version".to_string(), FactValue::Str(d.to_string()));
-        }
+    if let Some(d) = display_version
+        && !d.is_empty()
+    {
+        facts.insert("display_version".to_string(), FactValue::Str(d.to_string()));
     }
     facts.insert("architecture".to_string(), FactValue::Str(arch.to_string()));
     facts

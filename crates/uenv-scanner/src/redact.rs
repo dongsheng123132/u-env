@@ -25,10 +25,10 @@ pub fn redact(s: &str) -> String {
     if let Some(d) = &profile_dir {
         user_candidates.push(d.clone());
     }
-    if let Some(u) = &username {
-        if !user_candidates.iter().any(|c| c.eq_ignore_ascii_case(u)) {
-            user_candidates.push(u.clone());
-        }
+    if let Some(u) = &username
+        && !user_candidates.iter().any(|c| c.eq_ignore_ascii_case(u))
+    {
+        user_candidates.push(u.clone());
     }
 
     for user in &user_candidates {
@@ -43,19 +43,19 @@ pub fn redact(s: &str) -> String {
     }
 
     // 2. HOME / USERPROFILE 路径（反斜杠 + 正斜杠两个形态）
-    if let Ok(home) = env::var("USERPROFILE") {
-        if !home.is_empty() {
-            result = replace_case_insensitive(&result, &home, "<user>");
-            let home_fwd = home.replace('\\', "/");
-            result = replace_case_insensitive(&result, &home_fwd, "<user>");
-        }
+    if let Ok(home) = env::var("USERPROFILE")
+        && !home.is_empty()
+    {
+        result = replace_case_insensitive(&result, &home, "<user>");
+        let home_fwd = home.replace('\\', "/");
+        result = replace_case_insensitive(&result, &home_fwd, "<user>");
     }
 
     // 3. 机器名
-    if let Ok(host) = env::var("COMPUTERNAME") {
-        if !host.is_empty() {
-            result = replace_case_insensitive(&result, &host, "<host>");
-        }
+    if let Ok(host) = env::var("COMPUTERNAME")
+        && !host.is_empty()
+    {
+        result = replace_case_insensitive(&result, &host, "<host>");
     }
 
     // 4. 密钥样式串：sk-... / ghp_... / 等

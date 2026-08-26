@@ -152,10 +152,9 @@ pub fn parse_wsl(
     }
 
     // 4. 内核版本：wsl --version 的"内核版本"行（该命令在新版 WSL 才支持）
-    if version_ran {
-        if let Some(v) = extract_field(version_out, &["内核版本", "Kernel Version"]) {
-            facts.insert("kernel_version".to_string(), FactValue::Str(v));
-        }
+    if version_ran && let Some(v) = extract_field(version_out, &["内核版本", "Kernel Version"])
+    {
+        facts.insert("kernel_version".to_string(), FactValue::Str(v));
     }
 
     facts

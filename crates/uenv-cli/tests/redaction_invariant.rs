@@ -4,6 +4,10 @@
 //! 真实用户名泄进 facts → 报告/指纹/agent JSON。单点修完后，这里钉一条
 //! **类级闸门**：遍历一整棵真实扫描的 Environment 的全部 facts/volatile/evidence，
 //! 断言不含本机用户名等敏感串。以后任何 detector 引入新的泄漏出口，此测试变红。
+//!
+//! 放在 uenv-cli 包内（而非 uenv-scanner）：集成测试可用 `CARGO_BIN_EXE_uenv`
+//! 直接定位二进制，构建顺序由 cargo 保证；跨包硬拼 target 路径在 clean 后
+//! 或 clippy 先行的 CI 序列下会因二进制不存在而假失败（2026-08-27 实测）。
 
 use std::collections::BTreeMap;
 
@@ -48,20 +52,6 @@ fn username() -> String {
     std::env::var("USERNAME").unwrap_or_default()
 }
 
-/// 定位 workspace 根下的 target/<profile>/uenv.exe（集成测试无法用 CARGO_BIN_EXE 跨包引用）
-fn path_join_target(exe: &str) -> std::path::PathBuf {
-    let mut p = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    // crates/uenv-scanner → workspace root
-    p.pop();
-    p.pop();
-    let profile = if cfg!(debug_assertions) {
-        "debug"
-    } else {
-        "release"
-    };
-    p.join("target").join(profile).join(exe)
-}
-
 #[test]
 #[cfg(windows)]
 fn redaction_invariant_real_scan_contains_no_username() {
@@ -70,13 +60,11 @@ fn redaction_invariant_real_scan_contains_no_username() {
         return; // 无 USERNAME 环境变量的极端环境跳过
     }
     // 真实扫描一次（与验收命令同路径）
-    // CARGO_BIN_EXE_uenv 只在 uenv-cli 的集成测试里可用；
-    // 这里直接调用已构建的 target 目录下的二进制（CI/本地 cargo test 前会先 build）
-    let exe = path_join_target("uenv.exe");
-    let output = std::process::Command::new(&exe)
+    let exe = env!("CARGO_BIN_EXE_uenv");
+    let output = std::process::Command::new(exe)
         .args(["scan", "--project", ".", "--json"])
         .output()
-        .unwrap_or_else(|e| panic!("failed to run {}: {e}", exe.display()));
+        .unwrap_or_else(|e| panic!("failed to run {exe}: {e}"));
     assert!(
         output.status.success(),
         "uenv scan failed: {}",

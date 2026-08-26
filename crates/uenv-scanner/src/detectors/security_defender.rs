@@ -135,19 +135,18 @@ pub fn parse_defender(
             match serde_json::from_str::<serde_json::Value>(t) {
                 Ok(serde_json::Value::Array(arr)) => {
                     for item in arr {
-                        if let Some(s) = item.as_str() {
-                            if !s.is_empty() {
-                                paths.push(s.to_string());
-                            }
+                        if let Some(s) = item.as_str()
+                            && !s.is_empty()
+                        {
+                            paths.push(s.to_string());
                         }
                     }
                 }
-                Ok(serde_json::Value::String(s)) => {
+                Ok(serde_json::Value::String(s))
                     // 单个字符串（无排除项时可能输出 null，单个值时是字符串）
-                    if !s.is_empty() && !s.eq_ignore_ascii_case("null") {
+                    if !s.is_empty() && !s.eq_ignore_ascii_case("null") => {
                         paths.push(s);
                     }
-                }
                 _ => {}
             }
         } else {

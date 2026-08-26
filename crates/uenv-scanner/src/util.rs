@@ -54,7 +54,7 @@ fn decode_bytes(bytes: &[u8]) -> String {
 /// 低位非零、高位为零。T0 曾误用 `step_by(2)` 检查低位，导致 wsl.exe 的
 /// 无 BOM UTF-16LE 输出永远判 false → 走 GBK 解码 → 乱码。
 fn is_likely_utf16le(bytes: &[u8]) -> bool {
-    if bytes.len() % 2 != 0 {
+    if !bytes.len().is_multiple_of(2) {
         return false;
     }
     let total_pairs = bytes.len() / 2;
@@ -71,7 +71,9 @@ fn is_likely_utf16le(bytes: &[u8]) -> bool {
 
 fn decode_utf16le(bytes: &[u8]) -> String {
     let u16s: Vec<u16> = bytes
-        .chunks_exact(2)
+        .as_chunks::<2>()
+        .0
+        .iter()
         .map(|c| u16::from_le_bytes([c[0], c[1]]))
         .collect();
     String::from_utf16_lossy(&u16s)
@@ -79,7 +81,9 @@ fn decode_utf16le(bytes: &[u8]) -> String {
 
 fn decode_utf16be(bytes: &[u8]) -> String {
     let u16s: Vec<u16> = bytes
-        .chunks_exact(2)
+        .as_chunks::<2>()
+        .0
+        .iter()
         .map(|c| u16::from_be_bytes([c[0], c[1]]))
         .collect();
     String::from_utf16_lossy(&u16s)

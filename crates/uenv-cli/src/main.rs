@@ -588,50 +588,50 @@ fn run_scan_env(cli: &Cli, out: &Output) -> (Environment, usize, u64) {
     };
 
     // 用 windows.version detector 的 facts 回填 identity.os（T0 遗留：恒为 Unknown）
-    if let Some(rec) = env.detectors.get("windows.version") {
-        if rec.status == DetectStatus::Ok {
-            let get_str = |k: &str| match rec.facts.get(k) {
-                Some(uenv_core::FactValue::Str(s)) => Some(s.clone()),
-                _ => None,
-            };
-            let get_int = |k: &str| match rec.facts.get(k) {
-                Some(uenv_core::FactValue::Int(i)) => Some(*i as u32),
-                _ => None,
-            };
-            let os = &mut env.identity.os;
-            if let Some(p) = get_str("product_name") {
-                os.product_name = p;
-            }
-            if let Some(p) = get_str("product_name_raw") {
-                os.product_name_raw = p;
-            }
-            if let Some(v) = get_str("version") {
-                os.version = v;
-            }
-            if let Some(b) = get_int("build") {
-                os.build = b;
-            }
-            if let Some(u) = get_int("ubr") {
-                os.ubr = Some(u);
-            }
-            if let Some(e) = get_str("edition") {
-                os.edition = Some(e);
-            }
-            if let Some(d) = get_str("display_version") {
-                os.display_version = Some(d);
-            }
+    if let Some(rec) = env.detectors.get("windows.version")
+        && rec.status == DetectStatus::Ok
+    {
+        let get_str = |k: &str| match rec.facts.get(k) {
+            Some(uenv_core::FactValue::Str(s)) => Some(s.clone()),
+            _ => None,
+        };
+        let get_int = |k: &str| match rec.facts.get(k) {
+            Some(uenv_core::FactValue::Int(i)) => Some(*i as u32),
+            _ => None,
+        };
+        let os = &mut env.identity.os;
+        if let Some(p) = get_str("product_name") {
+            os.product_name = p;
+        }
+        if let Some(p) = get_str("product_name_raw") {
+            os.product_name_raw = p;
+        }
+        if let Some(v) = get_str("version") {
+            os.version = v;
+        }
+        if let Some(b) = get_int("build") {
+            os.build = b;
+        }
+        if let Some(u) = get_int("ubr") {
+            os.ubr = Some(u);
+        }
+        if let Some(e) = get_str("edition") {
+            os.edition = Some(e);
+        }
+        if let Some(d) = get_str("display_version") {
+            os.display_version = Some(d);
         }
     }
     // 架构（x64 等）也回填
-    if let Some(rec) = env.detectors.get("windows.version") {
-        if let Some(uenv_core::FactValue::Str(a)) = rec.facts.get("architecture") {
-            env.identity.architecture = match a.as_str() {
-                "arm64" => uenv_core::Architecture::Arm64,
-                "x86" => uenv_core::Architecture::X86,
-                "x64" => uenv_core::Architecture::X64,
-                _ => uenv_core::Architecture::Unknown,
-            };
-        }
+    if let Some(rec) = env.detectors.get("windows.version")
+        && let Some(uenv_core::FactValue::Str(a)) = rec.facts.get("architecture")
+    {
+        env.identity.architecture = match a.as_str() {
+            "arm64" => uenv_core::Architecture::Arm64,
+            "x86" => uenv_core::Architecture::X86,
+            "x64" => uenv_core::Architecture::X64,
+            _ => uenv_core::Architecture::Unknown,
+        };
     }
 
     out.log(&format!(

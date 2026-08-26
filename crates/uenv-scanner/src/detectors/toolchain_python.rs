@@ -128,24 +128,24 @@ pub fn parse_python(
     if py_ver_ran {
         // "Python 3.12.7" → "3.12.7"
         let v = py_ver_stdout.trim();
-        if let Some(ver) = v.strip_prefix("Python ") {
-            if !ver.is_empty() {
-                facts.insert(
-                    "python_version".to_string(),
-                    FactValue::Version(ver.to_string()),
-                );
-            }
+        if let Some(ver) = v.strip_prefix("Python ")
+            && !ver.is_empty()
+        {
+            facts.insert(
+                "python_version".to_string(),
+                FactValue::Version(ver.to_string()),
+            );
         }
     }
     if launcher_ran {
         let v = launcher_stdout.trim();
-        if let Some(ver) = v.strip_prefix("Python ") {
-            if !ver.is_empty() {
-                facts.insert(
-                    "py_launcher_version".to_string(),
-                    FactValue::Version(ver.to_string()),
-                );
-            }
+        if let Some(ver) = v.strip_prefix("Python ")
+            && !ver.is_empty()
+        {
+            facts.insert(
+                "py_launcher_version".to_string(),
+                FactValue::Version(ver.to_string()),
+            );
         }
     }
     facts.insert(

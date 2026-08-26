@@ -58,45 +58,44 @@ impl Detector for ProjectDrift {
         let mut declared: BTreeMap<String, String> = BTreeMap::new();
 
         let pkg_path = root.join("package.json");
-        if pkg_path.is_file() {
-            if let Ok(content) = std::fs::read_to_string(&pkg_path) {
-                let (d, _) = crate::detectors::project_manifests::parse_package_json(&content);
-                declared.extend(d);
-            }
+        if pkg_path.is_file()
+            && let Ok(content) = std::fs::read_to_string(&pkg_path)
+        {
+            let (d, _) = crate::detectors::project_manifests::parse_package_json(&content);
+            declared.extend(d);
         }
         let cargo_path = root.join("Cargo.toml");
-        if cargo_path.is_file() {
-            if let Ok(content) = std::fs::read_to_string(&cargo_path) {
-                if let Some(rs) = crate::detectors::project_manifests::parse_cargo_toml(&content) {
-                    declared.insert("rust".to_string(), rs);
-                }
-            }
+        if cargo_path.is_file()
+            && let Ok(content) = std::fs::read_to_string(&cargo_path)
+            && let Some(rs) = crate::detectors::project_manifests::parse_cargo_toml(&content)
+        {
+            declared.insert("rust".to_string(), rs);
         }
         for f in [".nvmrc", ".node-version"] {
             let p = root.join(f);
-            if p.is_file() {
-                if let Ok(content) = std::fs::read_to_string(&p) {
-                    let v = content.trim();
-                    if !v.is_empty() {
-                        declared.insert("node".to_string(), v.to_string());
-                    }
+            if p.is_file()
+                && let Ok(content) = std::fs::read_to_string(&p)
+            {
+                let v = content.trim();
+                if !v.is_empty() {
+                    declared.insert("node".to_string(), v.to_string());
                 }
             }
         }
         for f in ["rust-toolchain.toml", "rust-toolchain"] {
             let p = root.join(f);
-            if p.is_file() {
-                if let Ok(content) = std::fs::read_to_string(&p) {
-                    for line in content.lines() {
-                        let t = line.trim();
-                        if let Some(rest) = t.strip_prefix("channel") {
-                            if let Some(eq) = rest.find('=') {
-                                let v = rest[eq + 1..].trim().trim_matches('"');
-                                if !v.is_empty() {
-                                    declared.insert("rust".to_string(), v.to_string());
-                                    break;
-                                }
-                            }
+            if p.is_file()
+                && let Ok(content) = std::fs::read_to_string(&p)
+            {
+                for line in content.lines() {
+                    let t = line.trim();
+                    if let Some(rest) = t.strip_prefix("channel")
+                        && let Some(eq) = rest.find('=')
+                    {
+                        let v = rest[eq + 1..].trim().trim_matches('"');
+                        if !v.is_empty() {
+                            declared.insert("rust".to_string(), v.to_string());
+                            break;
                         }
                     }
                 }
@@ -220,14 +219,14 @@ fn version_satisfies(actual: &str, range: &str) -> Satisfied {
         };
         if range.contains('<') {
             // ">=20 <23" 双边界（也可能是 ">=20 <23.0.0"）
-            if let Some(hi_part) = range.split('<').nth(1) {
-                if let Some(hi_v) = parse_version(hi_part) {
-                    return if ge(act, lo_v) && lt(act, hi_v) {
-                        Satisfied::Yes
-                    } else {
-                        Satisfied::No
-                    };
-                }
+            if let Some(hi_part) = range.split('<').nth(1)
+                && let Some(hi_v) = parse_version(hi_part)
+            {
+                return if ge(act, lo_v) && lt(act, hi_v) {
+                    Satisfied::Yes
+                } else {
+                    Satisfied::No
+                };
             }
         }
         return if ge(act, lo_v) {

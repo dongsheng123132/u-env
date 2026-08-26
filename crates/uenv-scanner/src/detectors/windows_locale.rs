@@ -97,22 +97,22 @@ pub fn parse_locale(
     system_locale: Option<&str>,
 ) -> BTreeMap<String, FactValue> {
     let mut facts = BTreeMap::new();
-    if let Some(a) = acp {
-        if !a.is_empty() {
-            facts.insert("acp".to_string(), FactValue::Str(a.to_string()));
-            // UTF-8 beta 开关：ACP == 65001
-            facts.insert("utf8_beta".to_string(), FactValue::Bool(a == "65001"));
-        }
+    if let Some(a) = acp
+        && !a.is_empty()
+    {
+        facts.insert("acp".to_string(), FactValue::Str(a.to_string()));
+        // UTF-8 beta 开关：ACP == 65001
+        facts.insert("utf8_beta".to_string(), FactValue::Bool(a == "65001"));
     }
-    if let Some(o) = oem_cp {
-        if !o.is_empty() {
-            facts.insert("oem_cp".to_string(), FactValue::Str(o.to_string()));
-        }
+    if let Some(o) = oem_cp
+        && !o.is_empty()
+    {
+        facts.insert("oem_cp".to_string(), FactValue::Str(o.to_string()));
     }
-    if let Some(l) = system_locale {
-        if !l.is_empty() {
-            facts.insert("system_locale".to_string(), FactValue::Str(l.to_string()));
-        }
+    if let Some(l) = system_locale
+        && !l.is_empty()
+    {
+        facts.insert("system_locale".to_string(), FactValue::Str(l.to_string()));
     }
     facts
 }
