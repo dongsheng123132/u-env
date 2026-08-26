@@ -109,10 +109,11 @@ fn detect_filesystem(ctx: &ScanContext, drive: &str, evidence: &mut Vec<Evidence
             "fsutil fsinfo volumeinfo <drive>",
             &fsutil,
         ));
-        if fsutil.ran && fsutil.exit_code == Some(0) {
-            if let Some(fs) = parse_fsutil(&fsutil.stdout) {
-                return fs;
-            }
+        if fsutil.ran
+            && fsutil.exit_code == Some(0)
+            && let Some(fs) = parse_fsutil(&fsutil.stdout)
+        {
+            return fs;
         }
     }
 
