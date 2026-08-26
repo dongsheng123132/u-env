@@ -23,9 +23,11 @@ impl Rule for FsProjectOnNetwork {
     fn evaluate(&self, env: &Environment) -> Vec<Finding> {
         let desc = "项目放在网络盘（UNC 或映射盘）。编译器对网络延迟极其敏感——Rust 增量编译、npm install、git 操作都会慢一个数量级，且网络抖动会直接造成构建失败或仓库损坏。开发项目必须放本地 SSD。";
         let fix_safety = Safety::Manual;
-        let fix_explain = "把项目复制到本地盘开发，网络盘只做备份/分发";
-        let fix_commands: &[&str] = &["echo \"复制到本地：robocopy Z:\\proj C:\\dev\\proj /E\""];
-        let fix_rollback: &[&str] = &["（无法自动回滚——涉及项目迁移）"];
+        let fix_explain =
+            "把项目复制到本地盘开发，网络盘只做备份/分发（手动迁移，无法自动执行，也无法自动回滚）";
+        // 手动档不提供命令；commands 为空则 rollback 允许为空（契约见架构文档 §3 SuggestedFix）
+        let fix_commands: &[&str] = &[];
+        let fix_rollback: &[&str] = &[];
         let on = crate::helpers::fact_bool(env, "fs.project-location", "on_network");
         let Some(true) = on else {
             return vec![];

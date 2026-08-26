@@ -23,9 +23,10 @@ impl Rule for FsProjectOnOnedrive {
     fn evaluate(&self, env: &Environment) -> Vec<Finding> {
         let desc = "项目放在 OneDrive 同步目录下。OneDrive 的按需文件（placeholder）会让编译器读到空壳文件，git 仓库的 .git 被同步还可能造成索引损坏；文件锁和同步冲突会让 node_modules 这类海量小文件项目慢到怀疑人生。把开发项目移到本地盘（C:\\dev 或 D:\\dev），OneDrive 只留文档。";
         let fix_safety = Safety::Manual;
-        let fix_explain = "把项目移到 OneDrive 之外的本地目录并重新 clone";
-        let fix_commands: &[&str] = &["echo \"移动项目：move D:\\OneDrive\\proj C:\\dev\\proj\""];
-        let fix_rollback: &[&str] = &["（无法自动回滚——涉及项目迁移）"];
+        let fix_explain = "把项目移到 OneDrive 之外的本地目录并重新 clone（手动迁移，无法自动执行，也无法自动回滚）";
+        // 手动档不提供命令；commands 为空则 rollback 允许为空（契约见架构文档 §3 SuggestedFix）
+        let fix_commands: &[&str] = &[];
+        let fix_rollback: &[&str] = &[];
         let on = crate::helpers::fact_bool(env, "fs.project-location", "on_onedrive");
         let Some(true) = on else {
             return vec![];

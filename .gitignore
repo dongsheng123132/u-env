@@ -1,1 +1,6 @@
 /target
+# 运行产物（验收产物 report.md / environment.origin.json 除外，它们已入库）
+uenv-out.json
+uenv-err.txt
+# agent 会话数据不入库
+.hermes/
