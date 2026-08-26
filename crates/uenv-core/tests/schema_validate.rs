@@ -147,20 +147,19 @@ fn walk(value: &Value, schema: &Value, defs: &Value, path: &str, errors: &mut Ve
             }
         }
     }
-    if let Some(additional) = schema.get("additionalProperties") {
-        if !additional.is_null() {
-            if let Value::Object(map) = value {
-                for (k, sub) in map {
-                    walk(sub, additional, defs, &format!("{path}.{k}"), errors);
-                }
-            }
+    if let Some(additional) = schema.get("additionalProperties")
+        && !additional.is_null()
+        && let Value::Object(map) = value
+    {
+        for (k, sub) in map {
+            walk(sub, additional, defs, &format!("{path}.{k}"), errors);
         }
     }
-    if let Some(Value::Array(items)) = schema.get("items") {
-        if let Value::Array(arr) = value {
-            for (i, item) in arr.iter().enumerate() {
-                walk(item, &items[0], defs, &format!("{path}[{i}]"), errors);
-            }
+    if let Some(Value::Array(items)) = schema.get("items")
+        && let Value::Array(arr) = value
+    {
+        for (i, item) in arr.iter().enumerate() {
+            walk(item, &items[0], defs, &format!("{path}[{i}]"), errors);
         }
     }
 }
