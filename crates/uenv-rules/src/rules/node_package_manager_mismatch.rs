@@ -23,11 +23,7 @@ impl Rule for NodePackageManagerMismatch {
     fn evaluate(&self, env: &Environment) -> Vec<Finding> {
         let desc = "package.json 的 packageManager 声明了 pnpm/yarn，但项目里实际生成的是另一种锁文件（如声明 pnpm 却有 package-lock.json）。pnpm 的 node_modules 布局和 npm 完全不同，用错管理器装依赖会得到残缺的 node_modules，运行时各种 module not found。锁文件是谁生成的，就用谁安装——删掉多余的锁文件后统一用一种管理器。";
         let fix_safety = Safety::Manual;
-        let fix_explain = "统一包管理器：保留 packageManager 声明的管理器对应的锁文件，删除其余";
-        let fix_commands: &[&str] =
-            &["echo \"删除多余锁文件后重新安装：pnpm install（以声明 pnpm 为例）\""];
-        let fix_rollback: &[&str] =
-            &["git checkout -- package-lock.json yarn.lock pnpm-lock.yaml 2>NUL"];
+        let fix_explain = "统一包管理器：保留 packageManager 声明的管理器对应的锁文件，删除其余后用声明的管理器重装（如声明 pnpm：删 package-lock.json 后跑 pnpm install；误删可 git checkout -- <文件名> 找回）";
         let pm = crate::helpers::fact_str(env, "project.manifests", "package_manager");
         let lockfiles = crate::helpers::lockfile_names(env);
         let Some(pm) = pm else {
@@ -42,12 +38,8 @@ impl Rule for NodePackageManagerMismatch {
         };
         if !lockfiles.is_empty() && !lockfiles.iter().any(|f| f == expected) {
             vec![
-                finding(self.id(), Severity::Warning, "包管理器与锁文件不一致", desc).with_fix(
-                    fix_safety,
-                    fix_explain,
-                    fix_commands,
-                    fix_rollback,
-                ),
+                finding(self.id(), Severity::Warning, "包管理器与锁文件不一致", desc)
+                    .with_fix(fix_safety, fix_explain),
             ]
         } else {
             vec![]

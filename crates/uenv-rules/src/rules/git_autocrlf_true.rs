@@ -23,9 +23,7 @@ impl Rule for GitAutocrlfTrue {
     fn evaluate(&self, env: &Environment) -> Vec<Finding> {
         let desc = "core.autocrlf=true 会在 checkout 时把 LF 转 CRLF。Rust 项目（尤其带 .sh 脚本、Makefile、或者被 CI 拉取在 Linux 上构建的仓库）会因为行尾转换产生 diff 噪音甚至脚本执行错误。建议对仓库用 .gitattributes 显式声明，或对代码仓库设 autocrlf=input/false。";
         let fix_safety = Safety::Confirm;
-        let fix_explain = "对本仓库关闭 autocrlf 或改用 input";
-        let fix_commands: &[&str] = &["git config core.autocrlf input"];
-        let fix_rollback: &[&str] = &["git config core.autocrlf true"];
+        let fix_explain = "对本仓库关闭 autocrlf 或改用 input。触发条件钉住了旧值——本条只在当前 core.autocrlf=true 时触发，rollback 设回 true 即还原";
         if !crate::helpers::kind_is(env, "rust") {
             return vec![];
         }
@@ -41,7 +39,7 @@ impl Rule for GitAutocrlfTrue {
                     "git core.autocrlf=true 对 Rust 项目有风险",
                     desc,
                 )
-                .with_fix(fix_safety, fix_explain, fix_commands, fix_rollback),
+                .with_fix(fix_safety, fix_explain),
             ]
         } else {
             vec![]

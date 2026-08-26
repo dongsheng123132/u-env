@@ -23,9 +23,8 @@ impl Rule for FsProjectPathNonAscii {
     fn evaluate(&self, env: &Environment) -> Vec<Finding> {
         let desc = "项目路径包含中文等非 ASCII 字符。虽然现代工具大多支持 UTF-8 路径，但仍有大量老工具链/原生库按 ANSI 处理路径（尤其 MSVC 老版本、部分 npm 原生模块的编译脚本），会报「无法打开文件」或乱码路径错误。能改则改，至少心里有数。";
         let fix_safety = Safety::Manual;
-        let fix_explain = "将项目移到纯 ASCII 路径（如 C:\\dev\\proj）";
-        let fix_commands: &[&str] = &["echo \"建议路径只含 a-zA-Z0-9-_\""];
-        let fix_rollback: &[&str] = &["（无法自动回滚——涉及项目迁移）"];
+        let fix_explain =
+            "将项目移到纯 ASCII 路径（如 C:\\dev\\proj；手动迁移，无法自动执行，也无法自动回滚）";
         let v = crate::helpers::fact_bool(env, "fs.project-location", "path_has_non_ascii");
         let Some(true) = v else {
             return vec![];
@@ -37,7 +36,7 @@ impl Rule for FsProjectPathNonAscii {
                 "项目路径含非 ASCII 字符",
                 desc,
             )
-            .with_fix(fix_safety, fix_explain, fix_commands, fix_rollback),
+            .with_fix(fix_safety, fix_explain),
         ]
     }
 }

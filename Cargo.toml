@@ -6,7 +6,9 @@ resolver = "2"
 version = "0.0.1"
 edition = "2024"
 license = "Apache-2.0"
-repository = "https://github.com/u-king/uenv"
+# P0-2（docs/13）：发布前指向将建的开源仓 u-env（dongsheng123132/u-env）。
+# 仓库尚未创建；建仓推送后此地址即真实生效，不再是指向不存在 org 的占位。
+repository = "https://github.com/dongsheng123132/u-env"
 rust-version = "1.88"
 
 [workspace.dependencies]

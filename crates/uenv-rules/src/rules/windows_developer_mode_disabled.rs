@@ -22,22 +22,16 @@ impl Rule for WindowsDeveloperModeDisabled {
 
     fn evaluate(&self, env: &Environment) -> Vec<Finding> {
         let desc = "开发者模式关闭时，符号链接创建（mklink）、部分调试器附加、UWP 侧载会被限制。Tauri/WinUi 项目的调试流程（尤其 symlink 依赖和开发证书）可能莫名失败。这个开关只影响开发体验，不影响已构建产物的运行。";
-        let fix_safety = Safety::Confirm;
-        let fix_explain = "开启开发者模式（设置 → 隐私和安全性 → 开发者选项）";
-        let fix_commands: &[&str] = &["start ms-settings:developers"];
-        let fix_rollback: &[&str] = &["（手动关闭同一开关）"];
+        let fix_safety = Safety::Manual;
+        let fix_explain = "开启开发者模式：设置 → 隐私和安全性 → 开发者选项（可在运行框输入 ms-settings:developers 直达；再次关闭同一开关即回滚）";
         let enabled = crate::helpers::fact_bool(env, "windows.developer-mode", "enabled");
         let Some(false) = enabled else {
             return vec![];
         };
         if crate::helpers::kind_is(env, "tauri") || crate::helpers::kind_is(env, "winui") {
             vec![
-                finding(self.id(), Severity::Warning, "开发者模式未开启", desc).with_fix(
-                    fix_safety,
-                    fix_explain,
-                    fix_commands,
-                    fix_rollback,
-                ),
+                finding(self.id(), Severity::Warning, "开发者模式未开启", desc)
+                    .with_fix(fix_safety, fix_explain),
             ]
         } else {
             vec![]

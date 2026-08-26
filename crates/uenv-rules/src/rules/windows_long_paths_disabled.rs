@@ -23,13 +23,7 @@ impl Rule for WindowsLongPathsDisabled {
     fn evaluate(&self, env: &Environment) -> Vec<Finding> {
         let desc = "Windows 默认 PATH_MAX 260 字符。node_modules 深嵌套 + 中文/长项目名很容易超限，报错长相各异（ENAMETOOLONG、\"系统找不到指定的路径\"、npm 装一半失败）。项目路径越深或依赖越重（Node 项目几乎必中）风险越高。开启后新进程生效，已开的终端要重开。";
         let fix_safety = Safety::Confirm;
-        let fix_explain = "开启系统长路径支持（需管理员），改注册表后重启终端";
-        let fix_commands: &[&str] = &[
-            "powershell -NoProfile -Command \"New-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem' -Name LongPathsEnabled -Value 1 -PropertyType DWord -Force\"",
-        ];
-        let fix_rollback: &[&str] = &[
-            "powershell -NoProfile -Command \"Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem' -Name LongPathsEnabled -Value 0\"",
-        ];
+        let fix_explain = "开启系统长路径支持（需管理员），改注册表后重启终端。本条只在长路径当前为关（=0）时触发，rollback 设回 0 即严格还原原状";
         let enabled = crate::helpers::fact_bool(env, "windows.long-paths", "enabled");
         let Some(false) = enabled else {
             return vec![];
@@ -41,12 +35,7 @@ impl Rule for WindowsLongPathsDisabled {
         } else {
             Severity::Warning
         };
-        vec![finding(self.id(), sev, "长路径支持未开启", desc).with_fix(
-            fix_safety,
-            fix_explain,
-            fix_commands,
-            fix_rollback,
-        )]
+        vec![finding(self.id(), sev, "长路径支持未开启", desc).with_fix(fix_safety, fix_explain)]
     }
 }
 

@@ -23,21 +23,15 @@ impl Rule for FsProjectPathHasSpace {
     fn evaluate(&self, env: &Environment) -> Vec<Finding> {
         let desc = "项目路径含空格。大多数现代工具能处理，但部分构建脚本（尤其 Makefile、批处理、老版 MSBuild）不引号拼接路径时会断。Rust/Tauri 项目的 linker 调用偶发踩坑。属低概率问题，先记录，遇到诡异路径错误再迁移。";
         let fix_safety = Safety::Manual;
-        let fix_explain = "如遇构建脚本路径报错，将项目移到无空格路径";
-        let fix_commands: &[&str] = &["echo \"建议路径不含空格，如 C:\\dev\\my-app\""];
-        let fix_rollback: &[&str] = &["（无法自动回滚）"];
+        let fix_explain = "如遇构建脚本路径报错，将项目移到无空格路径（手动迁移：robocopy 或资源管理器复制后删除旧目录；无法自动执行，也无法自动回滚）";
         let v = crate::helpers::fact_bool(env, "fs.project-location", "path_has_space");
         let Some(true) = v else {
             return vec![];
         };
         if crate::helpers::kind_is(env, "rust") || crate::helpers::kind_is(env, "tauri") {
             vec![
-                finding(self.id(), Severity::Info, "项目路径含空格", desc).with_fix(
-                    fix_safety,
-                    fix_explain,
-                    fix_commands,
-                    fix_rollback,
-                ),
+                finding(self.id(), Severity::Info, "项目路径含空格", desc)
+                    .with_fix(fix_safety, fix_explain),
             ]
         } else {
             vec![]

@@ -34,15 +34,8 @@ impl Rule for NodeMultipleInPath {
             ),
         )
         .with_fix(
-            Safety::Confirm,
-            "列出 PATH 中全部 node 位置，确认后手动移除多余项",
-            &[
-                "where node",
-                "powershell -NoProfile -Command \"(Get-Command node -All).Source\"",
-            ],
-            &[
-                "（无自动回滚——只读命令，改动需手动在系统设置里撤）",
-            ],
+            Safety::Manual,
+            "先列出 PATH 中全部 node 位置（where node，或 PowerShell 的 (Get-Command node -All).Source），确认后在系统设置里手动移除多余项；建议统一到一个版本管理器（nvm-windows / fnm / volta）管理。改动发生在系统环境变量里，本工具不代执行、无法自动回滚",
         )]
     }
 }

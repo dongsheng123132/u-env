@@ -23,10 +23,7 @@ impl Rule for WinsdkMissing {
     fn evaluate(&self, env: &Environment) -> Vec<Finding> {
         let desc = "Tauri/WinUi 项目链接时需要 Windows SDK（windows crate / C++ / WinAppSDK 都要）。SDK 缺失时链接报一堆 unresolved external symbol 或找不到 windows.h。随 Build Tools 一起装 Windows SDK 组件即可。";
         let fix_safety = Safety::Manual;
-        let fix_explain = "在 VS Installer 里勾选 Windows SDK（或装独立 Windows SDK）";
-        let fix_commands: &[&str] =
-            &["start https://developer.microsoft.com/windows/downloads/windows-sdk/"];
-        let fix_rollback: &[&str] = &["（卸载 SDK）"];
+        let fix_explain = "在 VS Installer 里勾选 Windows SDK（或装独立 Windows SDK，下载页：https://developer.microsoft.com/windows/downloads/windows-sdk/；卸载 SDK 即回滚）";
         if !crate::helpers::kind_is(env, "tauri") && !crate::helpers::kind_is(env, "winui") {
             return vec![];
         }
@@ -35,12 +32,8 @@ impl Rule for WinsdkMissing {
         match has_versions {
             Some(n) if n > 0 => vec![],
             _ => vec![
-                finding(self.id(), Severity::Error, "Windows SDK 未安装", desc).with_fix(
-                    fix_safety,
-                    fix_explain,
-                    fix_commands,
-                    fix_rollback,
-                ),
+                finding(self.id(), Severity::Error, "Windows SDK 未安装", desc)
+                    .with_fix(fix_safety, fix_explain),
             ],
         }
     }

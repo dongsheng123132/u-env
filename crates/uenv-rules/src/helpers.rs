@@ -133,19 +133,103 @@ pub fn finding(rule_id: &str, severity: Severity, title: &str, description: &str
     }
 }
 
-/// Finding 扩展：挂 SuggestedFix（commands 非空则 rollback 必须非空）
+/// Finding 扩展：挂 SuggestedFix。
+///
+/// 契约（docs/10 §3，2026-08-26 类级收紧）：
+/// 1. **Manual 档双空**：`commands` 与 `rollback` 都必须为空——手动档只有说明，
+///    不假装能执行。给人读的话（含示例命令）写进 `explain`。
+/// 2. **Safe/Confirm 档必须成对**：`commands` 非空则 `rollback` 必须非空，且
+///    二者必须是真逆操作——要么触发条件钉住了旧值（如 autocrlf=true 时建议改
+///    input，rollback 改回 true），要么 apply 第一步自带执行时快照（如 PATH
+///    先落备份文件再改写，rollback 从备份还原）。靠「重读当前值」冒充撤销的
+///    是伪回滚，过不了这里的断言。
+/// 3. **禁止说明文字混进命令**：任何以全角/半角左括号开头、或以 `echo ` 开头
+///    的条目都是给人读的注记，不是可执行命令——构造时直接 panic，让违规死在
+///    测试与开发期，而不是出现在用户面前。
+///
+/// 违反任一条 = panic（fail fast）。规则是静态表，构造点校验成本可忽略；
+/// 安全属性长在数据构造处，不依赖下游渲染端的自觉。
 pub trait FindingExt {
-    fn with_fix(self, safety: Safety, explain: &str, commands: &[&str], rollback: &[&str]) -> Self;
+    /// 挂建议。Manual 档只给 explain；Confirm/Safe 档用 with_executable_fix 给
+    /// 成对的 commands/rollback。两种途径都在构造点过 validate_fix_contract。
+    fn with_fix(self, safety: Safety, explain: &str) -> Self;
+
+    /// Confirm/Safe 档：可执行修复必须带 rollback 成对出现（契约条款 2）。
+    fn with_executable_fix(
+        self,
+        safety: Safety,
+        explain: &str,
+        commands: &[&str],
+        rollback: &[&str],
+    ) -> Self;
+}
+
+/// 校验一条 fix 是否满足契约，违规给出可定位的报错。
+/// 独立成函数以便单测直接覆盖各类违规样例。
+pub fn validate_fix_contract(
+    rule_hint: &str,
+    safety: Safety,
+    explain: &str,
+    commands: &[&str],
+    rollback: &[&str],
+) {
+    let _ = explain;
+    // 条款 3：禁止说明文字混进命令（对 commands 与 rollback 一视同仁）
+    for c in commands.iter().chain(rollback.iter()) {
+        let t = c.trim_start();
+        assert!(
+            !t.starts_with('（') && !t.starts_with('('),
+            "[{rule_hint}] 契约违规：括号开头的说明文字混进了命令：{c:?}（给人读的话放 explain）"
+        );
+        assert!(
+            !(t.starts_with("echo ") || t == "echo"),
+            "[{rule_hint}] 契约违规：echo 提示语不是真命令：{c:?}（要传达的信息放 explain）"
+        );
+    }
+    match safety {
+        // 条款 1：Manual 双空
+        Safety::Manual => {
+            assert!(
+                commands.is_empty() && rollback.is_empty(),
+                "[{rule_hint}] 契约违规：Manual 档的 commands/rollback 必须全空（现 commands={commands:?}, rollback={rollback:?}）；手动步骤写进 explain"
+            );
+        }
+        // 条款 2：非 Manual 且有命令则必须有回滚
+        Safety::Safe | Safety::Confirm => {
+            assert!(
+                commands.is_empty() || !rollback.is_empty(),
+                "[{rule_hint}] 契约违规：{safety:?} 档 commands 非空则 rollback 必须非空，且必须是真逆操作（触发条件钉住旧值，或 apply 自带执行时快照）"
+            );
+        }
+    }
 }
 
 impl FindingExt for Finding {
-    fn with_fix(
+    fn with_fix(mut self, safety: Safety, explain: &str) -> Self {
+        // Manual 档专用入口：强制双空（契约条款 1 在此结构性成立）。
+        validate_fix_contract("with_fix", safety, explain, &[], &[]);
+        self.suggested_fix = Some(SuggestedFix {
+            safety,
+            explain: explain.to_string(),
+            commands: vec![],
+            rollback: vec![],
+            docs_url: None,
+        });
+        self
+    }
+
+    fn with_executable_fix(
         mut self,
         safety: Safety,
         explain: &str,
         commands: &[&str],
         rollback: &[&str],
     ) -> Self {
+        assert!(
+            !matches!(safety, Safety::Manual),
+            "[with_executable_fix] 契约违规：可执行修复不允许挂在 Manual 档（手动步骤写 explain，用 with_fix）"
+        );
+        validate_fix_contract("with_executable_fix", safety, explain, commands, rollback);
         self.suggested_fix = Some(SuggestedFix {
             safety,
             explain: explain.to_string(),
@@ -154,5 +238,66 @@ impl FindingExt for Finding {
             docs_url: None,
         });
         self
+    }
+}
+
+#[cfg(test)]
+mod fix_contract_tests {
+    use super::*;
+
+    #[test]
+    fn manual_allows_empty_only() {
+        // Manual 双空：合法
+        validate_fix_contract("t", Safety::Manual, "说明", &[], &[]);
+    }
+
+    #[test]
+    #[should_panic(expected = "Manual 档")]
+    fn manual_rejects_commands() {
+        validate_fix_contract("t", Safety::Manual, "说明", &["git status"], &[]);
+    }
+
+    #[test]
+    #[should_panic(expected = "echo 提示语")]
+    fn echo_prose_is_banned_everywhere() {
+        validate_fix_contract(
+            "t",
+            Safety::Confirm,
+            "说明",
+            &[
+                "echo \"提示\"",
+                "powershell -Command \"Set-ItemProperty x\"",
+            ],
+            &["（手动恢复）"],
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "说明文字")]
+    fn parenthetical_prose_rollback_is_banned() {
+        validate_fix_contract(
+            "t",
+            Safety::Confirm,
+            "说明",
+            &["git config x"],
+            &["（无法回滚）"],
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "rollback 必须非空")]
+    fn confirm_without_rollback_is_banned() {
+        validate_fix_contract("t", Safety::Confirm, "说明", &["git config x"], &[]);
+    }
+
+    #[test]
+    fn confirm_pair_passes() {
+        validate_fix_contract(
+            "t",
+            Safety::Confirm,
+            "说明",
+            &["git config core.autocrlf input"],
+            &["git config core.autocrlf true"],
+        );
     }
 }

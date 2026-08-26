@@ -23,11 +23,7 @@ impl Rule for MsvcMissingBuildtools {
     fn evaluate(&self, env: &Environment) -> Vec<Finding> {
         let desc = "Rust(Tauri)/C++ 项目需要 MSVC 工具链（Build Tools 或 VS 含 C++ workload）。缺失时 rustc 报 linker not found（link.exe），cargo build 一步都走不了。只装 rustup 不装 MSVC 是 Windows 新手最常见的坑——rustc 装好了但没 linker。";
         let fix_safety = Safety::Manual;
-        let fix_explain = "安装 Visual Studio Build Tools，勾选「使用 C++ 的桌面开发」workload";
-        let fix_commands: &[&str] = &[
-            "start https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022",
-        ];
-        let fix_rollback: &[&str] = &["（卸载 Build Tools）"];
+        let fix_explain = "安装 Visual Studio Build Tools，勾选「使用 C++ 的桌面开发」workload（下载页：https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022；卸载即回滚，走「设置→应用」）";
         if !crate::helpers::kind_is(env, "rust") && !crate::helpers::kind_is(env, "tauri") {
             return vec![];
         }
@@ -35,12 +31,8 @@ impl Rule for MsvcMissingBuildtools {
         match has_cpp {
             Some(true) => vec![],
             _ => vec![
-                finding(self.id(), Severity::Error, "缺少 MSVC 构建工具", desc).with_fix(
-                    fix_safety,
-                    fix_explain,
-                    fix_commands,
-                    fix_rollback,
-                ),
+                finding(self.id(), Severity::Error, "缺少 MSVC 构建工具", desc)
+                    .with_fix(fix_safety, fix_explain),
             ],
         }
     }

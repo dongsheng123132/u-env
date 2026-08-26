@@ -34,15 +34,8 @@ impl Rule for RustMultipleCargoInPath {
             ),
         )
         .with_fix(
-            Safety::Confirm,
-            "列出 PATH 中全部 cargo 位置，确认后保留 rustup 的 ~/.cargo/bin 一份",
-            &[
-                "where cargo",
-                "rustup show active-toolchain",
-            ],
-            &[
-                "（无自动回滚——只读命令，改动需手动在系统设置里撤）",
-            ],
+            Safety::Manual,
+            "先列出 PATH 中全部 cargo 位置（where cargo）并确认当前工具链（rustup show active-toolchain），然后只保留 ~/.cargo/bin 这一份，其余手动从 PATH 移除。改动发生在系统环境变量里，本工具不代执行、无法自动回滚",
         )]
     }
 }

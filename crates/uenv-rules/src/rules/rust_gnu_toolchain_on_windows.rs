@@ -23,9 +23,9 @@ impl Rule for RustGnuToolchainOnWindows {
     fn evaluate(&self, env: &Environment) -> Vec<Finding> {
         let desc = "active toolchain 是 *-pc-windows-gnu。Tauri 依赖 MSVC 链接的 WebView2 绑定，GNU toolchain 下要么编不过要么运行时崩溃。Tauri 项目在 Windows 必须用 MSVC toolchain。rustup default stable-x86_64-pc-windows-msvc 即可。";
         let fix_safety = Safety::Confirm;
-        let fix_explain = "切换到 MSVC toolchain";
-        let fix_commands: &[&str] = &["rustup default stable-x86_64-pc-windows-msvc"];
-        let fix_rollback: &[&str] = &["rustup default stable-x86_64-pc-windows-gnu"];
+        let fix_explain = "切换到 MSVC toolchain（rustup 全局默认值；触发条件钉住了旧值——本条只在 active 是 *-gnu 时触发，rollback 切回 gnu 即还原）";
+        // 触发条件钉住旧值：仅当 active_toolchain 含 -gnu 时才出这条建议，
+        // 因此「切回 gnu」是严格逆操作。
         if !crate::helpers::kind_is(env, "tauri") {
             return vec![];
         }
@@ -41,7 +41,7 @@ impl Rule for RustGnuToolchainOnWindows {
                     "Windows 上使用 GNU toolchain 构建 Tauri",
                     desc,
                 )
-                .with_fix(fix_safety, fix_explain, fix_commands, fix_rollback),
+                .with_fix(fix_safety, fix_explain),
             ]
         } else {
             vec![]

@@ -26,19 +26,13 @@ impl Rule for FsProjectOnNetwork {
         let fix_explain =
             "把项目复制到本地盘开发，网络盘只做备份/分发（手动迁移，无法自动执行，也无法自动回滚）";
         // 手动档不提供命令；commands 为空则 rollback 允许为空（契约见架构文档 §3 SuggestedFix）
-        let fix_commands: &[&str] = &[];
-        let fix_rollback: &[&str] = &[];
         let on = crate::helpers::fact_bool(env, "fs.project-location", "on_network");
         let Some(true) = on else {
             return vec![];
         };
         vec![
-            finding(self.id(), Severity::Error, "项目在网络盘上", desc).with_fix(
-                fix_safety,
-                fix_explain,
-                fix_commands,
-                fix_rollback,
-            ),
+            finding(self.id(), Severity::Error, "项目在网络盘上", desc)
+                .with_fix(fix_safety, fix_explain),
         ]
     }
 }

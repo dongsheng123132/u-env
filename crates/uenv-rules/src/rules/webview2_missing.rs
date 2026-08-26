@@ -22,23 +22,16 @@ impl Rule for Webview2Missing {
 
     fn evaluate(&self, env: &Environment) -> Vec<Finding> {
         let desc = "Tauri/Electron 项目在 Windows 上依赖 WebView2 Runtime（Evergreen）。未安装时应用启动直接白屏或报「找不到 WebView2」。Win10 较新版本自带，但 Win10 旧版和精简版需要手动装 Evergreen Runtime。";
-        let fix_safety = Safety::Confirm;
-        let fix_explain = "下载安装 WebView2 Evergreen Runtime";
-        let fix_commands: &[&str] =
-            &["start https://developer.microsoft.com/microsoft-edge/webview2/"];
-        let fix_rollback: &[&str] = &["（卸载 WebView2 Runtime）"];
+        let fix_safety = Safety::Manual;
+        let fix_explain = "下载并安装 WebView2 Evergreen Runtime（https://developer.microsoft.com/microsoft-edge/webview2/；安装走系统安装器，卸载 Runtime 即回滚）";
         let installed = crate::helpers::fact_bool(env, "runtime.webview2", "installed");
         let Some(false) = installed else {
             return vec![];
         };
         if crate::helpers::kind_is(env, "tauri") || crate::helpers::kind_is(env, "electron") {
             vec![
-                finding(self.id(), Severity::Error, "WebView2 Runtime 未安装", desc).with_fix(
-                    fix_safety,
-                    fix_explain,
-                    fix_commands,
-                    fix_rollback,
-                ),
+                finding(self.id(), Severity::Error, "WebView2 Runtime 未安装", desc)
+                    .with_fix(fix_safety, fix_explain),
             ]
         } else {
             vec![]

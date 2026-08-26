@@ -23,11 +23,7 @@ impl Rule for SecurityDefenderScansProject {
     fn evaluate(&self, env: &Environment) -> Vec<Finding> {
         let desc = "Defender 实时保护开着，但排除项没覆盖项目目录。node_modules/cargo target 这类海量小文件每次构建都被实时扫描，编译时间可能慢 30-50%（尤其 Rust 增量编译）。把项目目录和工具链目录加进 Defender 排除项能显著提速——注意只排除你信任的开发目录。";
         let fix_safety = Safety::Manual;
-        let fix_explain = "把项目目录加入 Defender 排除项（需管理员）";
-        let fix_commands: &[&str] =
-            &["powershell -NoProfile -Command \"Add-MpPreference -ExclusionPath '<项目路径>'\""];
-        let fix_rollback: &[&str] =
-            &["powershell -NoProfile -Command \"Remove-MpPreference -ExclusionPath '<项目路径>'\""];
+        let fix_explain = "把项目目录加入 Defender 排除项（需管理员；Add-MpPreference -ExclusionPath '<项目路径>' 加排除，Remove-MpPreference -ExclusionPath '<项目路径>' 即回滚）。涉及安全软件配置，本工具不代执行";
         let rt = crate::helpers::fact_bool(env, "security.defender", "realtime_enabled");
         let Some(true) = rt else {
             return vec![];
@@ -43,7 +39,7 @@ impl Rule for SecurityDefenderScansProject {
                     "Defender 实时保护未排除项目目录",
                     desc,
                 )
-                .with_fix(fix_safety, fix_explain, fix_commands, fix_rollback),
+                .with_fix(fix_safety, fix_explain),
             ],
         }
     }
