@@ -25,14 +25,24 @@ $ uenv doctor --project .
 总结：0 error / 4 warning / 3 info
 ```
 
-（以上是 `uenv doctor` 在本仓库机器上的真实输出——这些问题是真存在的。）
+（以上是 `uenv doctor` 在本仓库机器上的真实输出——这些问题是真存在的。你的机器结果会不同。）
+
+> **只读承诺**：uenv 全程只读扫描；默认脱敏（用户名/机器名/密钥样式串自动替换）；零网络上传、无遥测。
+> 它给出建议命令但**不替你执行**——任何修复由你确认后自己运行。
 
 ## 安装
 
-当前为开发阶段，从源码构建：
+**v0.0.1-alpha**，两条路任选：
+
+**A. 直接下载（推荐，无需装 Rust）**
+
+到 [Releases](https://github.com/dongsheng123132/u-env/releases) 下载 `uenv-x86_64-pc-windows-msvc.zip`，
+核对 sha256 后解压，把 `uenv.exe` 放进 PATH。
+
+**B. 从源码构建（需 Rust 1.88+）**
 
 ```bash
-git clone <本仓库>
+git clone https://github.com/dongsheng123132/u-env.git
 cd u-env
 cargo build --release
 # 二进制在 target/release/uenv.exe，加入 PATH 即可

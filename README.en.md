@@ -22,14 +22,26 @@ $ uenv doctor --project .
 Summary: 0 error / 4 warning / 3 info
 ```
 
-(The output above is a real `uenv doctor` run on this repo's machine — those problems are real.)
+(The output above is a real `uenv doctor` run on this repo's machine — those problems are real. Your machine will differ.)
+
+> **Read-only promise**: uenv only reads; it never writes. Redaction is on by default
+> (usernames / machine names / key-like strings are masked). Zero network uploads, no telemetry.
+> It suggests fix commands but **never runs them** — every fix is executed by you, on purpose.
 
 ## Install
 
-Currently in development; build from source:
+**v0.0.1-alpha**, either way:
+
+**A. Download binary (recommended — no Rust toolchain needed)**
+
+Grab `uenv-x86_64-pc-windows-msvc.zip` from the
+[Releases](https://github.com/dongsheng123132/u-env/releases) page, verify the sha256,
+unzip, and put `uenv.exe` on your PATH.
+
+**B. Build from source (Rust 1.88+)**
 
 ```bash
-git clone <this repo>
+git clone https://github.com/dongsheng123132/u-env.git
 cd u-env
 cargo build --release
 # binary at target/release/uenv.exe — add to PATH
