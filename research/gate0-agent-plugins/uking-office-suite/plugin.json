@@ -1,0 +1,11 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "uking-office",
+  "version": "0.1.0",
+  "description": "U-King Office 套件：CSV/结构化数据出真 .xlsx/.docx/.pptx/.pdf，Office 文档读取与文本替换编辑，生成 .eml 邮件。纯 std 零依赖，离线可跑。",
+  "author": {
+    "name": "U-King"
+  },
+  "license": "MIT",
+  "keywords": ["office", "xlsx", "docx", "pptx", "pdf", "email", "uking"]
+}
