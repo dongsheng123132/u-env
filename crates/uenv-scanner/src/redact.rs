@@ -61,7 +61,7 @@ pub fn redact(s: &str) -> String {
     // 4. 密钥样式串：sk-... / ghp_... / 等
     result = redact_secrets(&result);
 
-    // 4.5 邮箱：git config 的 user.email 等（38004547@qq.com → <redacted>）
+    // 4.5 邮箱：git config 的 user.email 等（user@example.com → <redacted>）
     result = redact_emails(&result);
 
     // 5. 代理 URL 中的账号密码
@@ -323,7 +323,7 @@ mod tests {
     /// git config 的 user.email 必须脱敏
     #[test]
     fn git_email_redacted() {
-        let input = "file:C:/Users/me/.gitconfig\tuser.email=38004547@qq.com";
+        let input = "file:C:/Users/me/.gitconfig\tuser.email=user@example.com";
         let out = redact(input);
         assert!(!out.contains("38004547"), "got: {out}");
         assert!(out.contains("<redacted>"), "got: {out}");
