@@ -31,15 +31,13 @@ pub fn validate(value: &Value, schema: &Value) -> Result<(), Vec<ValidateError>>
 }
 
 fn walk(value: &Value, schema: &Value, defs: &Value, path: &str, errors: &mut Vec<ValidateError>) {
-    if let Some(ref_s) = schema.get("$ref") {
-        if let Some(rs) = ref_s.as_str() {
-            if let Some(stripped) = rs.strip_prefix("#/$defs/") {
-                if let Some(target) = defs.get(stripped) {
-                    walk(value, target, defs, path, errors);
-                    return;
-                }
-            }
-        }
+    if let Some(ref_s) = schema.get("$ref")
+        && let Some(rs) = ref_s.as_str()
+        && let Some(stripped) = rs.strip_prefix("#/$defs/")
+        && let Some(target) = defs.get(stripped)
+    {
+        walk(value, target, defs, path, errors);
+        return;
     }
     if let Some(one_of) = schema.get("oneOf").and_then(|v| v.as_array()) {
         let mut ok = false;

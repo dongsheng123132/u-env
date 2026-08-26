@@ -8,11 +8,11 @@ use uenv_core::{DetectStatus, Environment, FactValue, Finding, Safety, Severity,
 /// 取某 detector 的 facts（BTreeMap），detector 不存在/Error → 空 map
 pub fn detector_facts<'a>(env: &'a Environment, id: &str) -> BTreeMap<&'a str, &'a FactValue> {
     let mut out = BTreeMap::new();
-    if let Some(record) = env.detectors.get(id) {
-        if record.status != DetectStatus::Error {
-            for (k, v) in &record.facts {
-                out.insert(k.as_str(), v);
-            }
+    if let Some(record) = env.detectors.get(id)
+        && record.status != DetectStatus::Error
+    {
+        for (k, v) in &record.facts {
+            out.insert(k.as_str(), v);
         }
     }
     out
